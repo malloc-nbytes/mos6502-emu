@@ -77,16 +77,20 @@ impl Mos6502 {
 
     ////////// HELPER FUNCTIONS //////////
 
+    fn increment_program_counter(&mut self, increment: Word) {
+        self.pc += increment;
+    }
+
     fn use_cycles(&mut self, c: u32) {
         assert!(self.cycles > 0);
         self.cycles -= c;
     }
 
     fn fetch_byte(&mut self, mem: &Memory) -> Byte {
-        let byte = mem.get_byte(self.pc as usize);
-        self.pc += 1;
-        self.cycles -= 1;
-        byte.clone()
+        let b = mem.get_byte(self.pc as usize);
+        self.increment_program_counter(1);
+        self.use_cycles(1);
+        b
     }
 
     fn fetch_word(&mut self, mem: &mut Memory) -> Word {

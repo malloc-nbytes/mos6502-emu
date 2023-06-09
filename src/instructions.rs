@@ -726,12 +726,14 @@ pub const CMP_ZPX: Byte = 0xD5;
 // Bytes:           2
 // Cycles:          6
 pub const CMP_ZPX_IND: Byte = 0xC1;
+pub const CMP_ZPX_IND_CCOST: u32 = 6;
 
 // Addressing Mode: Zero Page Indirect Y-Indexed
 // Opcode:          $D1
 // Bytes:           2
 // Cycles:          ~5
 pub const CMP_ZPY_IND: Byte = 0xD1;
+pub const CMP_ZPY_IND_CCOST: u32 = 5;
 
 ////////// Compare Index Register X to Memory (CPX) //////////
 //
@@ -742,18 +744,21 @@ pub const CMP_ZPY_IND: Byte = 0xD1;
 // Bytes:           2
 // Cycles:          2
 pub const CPX_IMM: Byte = 0xE0;
+pub const CPX_IMM_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $EC
 // Bytes:           3
 // Cycles:          4
 pub const CPX_ABS: Byte = 0xEC;
+pub const CPX_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $E4
 // Bytes:           2
 // Cycles:          3
 pub const CPX_ZP: Byte = 0xE4;
+pub const CPX_ZP_CCOST: u32 = 3;
 
 ////////// Compare Index Register Y to Memory (CPY) //////////
 //
@@ -764,18 +769,21 @@ pub const CPX_ZP: Byte = 0xE4;
 // Bytes:           2
 // Cycles:          2
 pub const CPY_IMM: Byte = 0xC0;
+pub const CPY_IMM_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $CC
 // Bytes:           3
 // Cycles:          4
 pub const CPY_ABS: Byte = 0xCC;
+pub const CPY_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $C4
 // Bytes:           2
 // Cycles:          3
 pub const CPY_ZP: Byte = 0xC4;
+pub const CPY_ZP_CCOST: u32 = 3;
 
 ////////// Subtract Memory from Accumulator with Borrow (SBC) //////////
 //
@@ -788,48 +796,56 @@ pub const CPY_ZP: Byte = 0xC4;
 // Bytes:           2
 // Cycles:          2
 pub const SBC_IMM: Byte = 0xE9;
+pub const SBC_IMM_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $ED
 // Bytes:           3
 // Cycles:          4
 pub const SBC_ABS: Byte = 0xED;
+pub const SBC_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $FD
 // Bytes:           3
 // Cycles:          ~4
 pub const SBC_ABSX: Byte = 0xFD;
+pub const SBC_ABSX_CCOST: u32 = 4;
 
 // Addressing Mode: Y-Indexed Absolute
 // Opcode:          $F9
 // Bytes:           3
 // Cycles:          ~4
 pub const SBC_ABSY: Byte = 0xF9;
+pub const SBC_ABSY_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $E5
 // Bytes:           2
 // Cycles:          3
 pub const SBC_ZP: Byte = 0xE5;
+pub const SBC_ZP_CCOST: u32 = 3;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $F5
 // Bytes:           2
 // Cycles:          4
 pub const SBC_ZPX: Byte = 0xF5;
+pub const SBC_ZPX_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Zero Page Indirect
 // Opcode:          $E1
 // Bytes:           2
 // Cycles:          6
 pub const SBC_ZPX_IND: Byte = 0xE1;
+pub const SBC_ZPX_IND_CCOST: u32 = 6;
 
 // Addressing Mode: Zero Page Indirect Y-Indexed
 // Opcode:          $F1
 // Bytes:           2
 // Cycles:          ~5
 pub const SBC_ZPY_IND: Byte = 0xF1;
+pub const SBC_ZPY_IND_CCOST: u32 = 5;
 
 ////////// Decrement Memory by One (DEC) //////////
 //
@@ -840,24 +856,28 @@ pub const SBC_ZPY_IND: Byte = 0xF1;
 // Bytes:           3
 // Cycles:          6
 pub const DEC_ABS: Byte = 0xCE;
+pub const DEC_ABS_CCOST: u32 = 6;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $DE
 // Bytes:           3
 // Cycles:          7
 pub const DEC_ABSX: Byte = 0xDE;
+pub const DEC_ABSX_CCOST: u32 = 7;
 
 // Addressing Mode: Zero Page
 // Opcode:          $C6
 // Bytes:           2
 // Cycles:          5
 pub const DEC_ZP: Byte = 0xC6;
+pub const DEC_ZP_CCOST: u32 = 5;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $D6
 // Bytes:           2
 // Cycles:          6
 pub const DEC_ZPX: Byte = 0xD6;
+pub const DEC_ZPX_CCOST: u32 = 6;
 
 ////////// Decrement Index Register X by One (DEX) //////////
 //
@@ -868,6 +888,7 @@ pub const DEC_ZPX: Byte = 0xD6;
 // Bytes:           1
 // Cycles:          2
 pub const DEX_IMP: Byte = 0xCA;
+pub const DEX_IMP_CCOST: u32 = 2;
 
 ////////// Decrement Index Register Y by One (DEY) //////////
 //
@@ -878,6 +899,7 @@ pub const DEX_IMP: Byte = 0xCA;
 // Bytes:           1
 // Cycles:          2
 pub const DEY_IMP: Byte = 0x88;
+pub const DEY_IMP_CCOST: u32 = 2;
 
 ////////// Increment Memory by One (INC) //////////
 //
@@ -888,24 +910,28 @@ pub const DEY_IMP: Byte = 0x88;
 // Bytes:           3
 // Cycles:          6
 pub const INC_ABS: Byte = 0xEE;
+pub const INC_ABS_CCOST: u32 = 6;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $FE
 // Bytes:           3
 // Cycles:          7
 pub const INC_ABSX: Byte = 0xFE;
+pub const INC_ABSX_CCOST: u32 = 7;
 
 // Addressing Mode: Zero Page
 // Opcode:          $E6
 // Bytes:           2
 // Cycles:          5
 pub const INC_ZP: Byte = 0xE6;
+pub const INC_ZP_CCOST: u32 = 5;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $F6
 // Bytes:           2
 // Cycles:          6
 pub const INC_ZPX: Byte = 0xF6;
+pub const INC_ZPX_CCOST: u32 = 6;
 
 ////////// Increment Index Register X by One (INX) //////////
 //
@@ -916,6 +942,7 @@ pub const INC_ZPX: Byte = 0xF6;
 // Bytes:           1
 // Cycles:          2
 pub const INX_IMP: Byte = 0xE8;
+pub const INX_IMP_CCOST: u32 = 2;
 
 ////////// Increment Index Register Y by One (INY) //////////
 //
@@ -926,6 +953,7 @@ pub const INX_IMP: Byte = 0xE8;
 // Bytes:           1
 // Cycles:          2
 pub const INY_IMP: Byte = 0xC8;
+pub const INY_IMP_CCOST: u32 = 2;
 
 ////////// Break Command (BRK) //////////
 //
@@ -938,6 +966,7 @@ pub const INY_IMP: Byte = 0xC8;
 // Bytes:           1
 // Cycles:          7
 pub const BRK_IMP: Byte = 0x00;
+pub const BRK_IMP_CCOST: u32 = 7;
 
 ////////// JMP Indirect (JMP) //////////
 //
@@ -948,12 +977,14 @@ pub const BRK_IMP: Byte = 0x00;
 // Bytes:           3
 // Cycles:          3
 pub const JMP_ABS: Byte = 0x4C;
+pub const JMP_ABS_CCOST: u32 = 3;
 
 // Addressing Mode: Absolute Indirect
 // Opcode:          $6C
 // Bytes:           3
 // Cycles:          5
 pub const JMP_ABS_IND: Byte = 0x6C;
+pub const JMP_ABS_IND_CCOST: u32 = 5;
 
 ////////// Jump to Subroutine (JSR) //////////
 //
@@ -964,6 +995,7 @@ pub const JMP_ABS_IND: Byte = 0x6C;
 // Bytes:           3
 // Cycles:          6
 pub const JMP_SR: Byte = 0x20;
+pub const JMP_SR_CCOST: u32 = 6;
 
 ////////// Return From Interrupt (RTI) //////////
 //
@@ -974,6 +1006,7 @@ pub const JMP_SR: Byte = 0x20;
 // Bytes:           1
 // Cycles:          6
 pub const RTI_IMP: Byte = 0x40;
+pub const RTI_IMP_CCOST: u32 = 6;
 
 ////////// Return From Subroutine (RTS) //////////
 //
@@ -984,6 +1017,7 @@ pub const RTI_IMP: Byte = 0x40;
 // Bytes:           1
 // Cycles:          6
 pub const RTS_IMP: Byte = 0x60;
+pub const RTS_IMP_CCOST: u32 = 6;
 
 ////////// Branch on Carry Clear (BCC) //////////
 //
@@ -993,7 +1027,7 @@ pub const RTS_IMP: Byte = 0x60;
 // Opcode:          $90
 // Bytes:           2
 // Cycles:          ~*2
-pub const BCC_REL: Byte = 0x90;
+pub const BCC_REL_CCOST: u32 = 2;
 
 ////////// Branch on Carry Set (BCS) //////////
 //
@@ -1004,6 +1038,7 @@ pub const BCC_REL: Byte = 0x90;
 // Bytes:           2
 // Cycles:          ~*2
 pub const BCS_REL: Byte = 0xB0;
+pub const BCS_REL_CCOST: u32 = 2;
 
 ////////// Branch on Result Zero (BEQ) //////////
 //
@@ -1014,6 +1049,7 @@ pub const BCS_REL: Byte = 0xB0;
 // Bytes:           2
 // Cycles:          ~*2
 pub const BEQ_REL: Byte = 0xF0;
+pub const BEQ_REL_CCOST: u32 = 2;
 
 ////////// Branch on Result Minus (BMI) //////////
 //
@@ -1023,7 +1059,7 @@ pub const BEQ_REL: Byte = 0xF0;
 // Opcode:          $30
 // Bytes:           2
 // Cycles:          ~*2
-pub const BMI_REL: Byte = 0x30;
+pub const BMI_REL_CCOST: u32 = 2;
 
 ////////// Branch on Result Not Zero (BNE) //////////
 //
@@ -1034,6 +1070,7 @@ pub const BMI_REL: Byte = 0x30;
 // Bytes:           2
 // Cycles:          ~*2
 pub const BNE_REL: Byte = 0xD0;
+pub const BNE_REL_CCOST: u32 = 2;
 
 ////////// Branch on Result Plus (BPL) //////////
 //
@@ -1043,7 +1080,7 @@ pub const BNE_REL: Byte = 0xD0;
 // Opcode:          $10
 // Bytes:           2
 // Cycles:          ~*2
-pub const BPL_REL: Byte = 0x10;
+pub const BPL_REL_CCOST: u32 = 2;
 
 ////////// Branch on Overflow Clear (BVC) //////////
 //
@@ -1054,6 +1091,7 @@ pub const BPL_REL: Byte = 0x10;
 // Bytes:           2
 // Cycles:          ~*2
 pub const BVC_REL: Byte = 0x50;
+pub const BVC_REL_CCOST: u32 = 2;
 
 ////////// Branch on Overflow Set (BVS) //////////
 //
@@ -1064,6 +1102,7 @@ pub const BVC_REL: Byte = 0x50;
 // Bytes:           2
 // Cycles:          ~*2
 pub const BVS_REL: Byte = 0x70;
+pub const BVS_REL_CCOST: u32 = 2;
 
 ////////// Clear Carry Flag (CLC) //////////
 //
