@@ -1086,7 +1086,7 @@ pub const CLC_IMP: Byte = 0x18;
 // Cycles:          2
 pub const CLD_IMP: Byte = 0xD8;
 
-////////// Clear Interrupt Disable Bit (CLI) //////////
+////////// Clear Interrupt Disable (CLI) //////////
 //
 // Status Flags Affected: {(I: 0)}
 

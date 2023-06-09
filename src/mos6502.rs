@@ -4,9 +4,6 @@ use crate::instructions;
 type Byte = u8;
 type Word = u16;
 
-const STACKPTR_BEGIN: Word = 0x0100;
-const PROGRAM_COUNTER_BEGIN: Word = 0xFFFC;
-
 #[allow(dead_code)]
 enum Mos6502Flags {
     C = 0, // Carry bit.
@@ -20,12 +17,12 @@ enum Mos6502Flags {
 }
 
 impl Mos6502Flags {
-    pub fn set(self, src: Byte) -> Byte {
-        src | 1u8 << (self as Byte)
+    pub fn set(self, status: &mut Byte) {
+        *status |= 1u8 << (self as Byte);
     }
 
-    pub fn unset(self, src: Byte) -> Byte {
-        src & !(1u8 << (self as Byte))
+    pub fn unset(self, status: &mut Byte) {
+        *status &= !(1u8 << (self as Byte));
     }
 }
 
@@ -46,6 +43,9 @@ impl std::fmt::Display for Mos6502 {
     }
 }
 
+const STACKPTR_BEGIN: Word = 0x0100;
+const PROGRAM_COUNTER_BEGIN: Word = 0xFFFC;
+
 #[allow(dead_code)]
 impl Mos6502 {
     pub fn new(cycles: Option<u32>) -> Self {
@@ -62,6 +62,11 @@ impl Mos6502 {
         while self.cycles > 0 {
             let instr: Byte = self.fetch_byte(mem);
             match instr {
+                instructions::CLC_IMP => self.clear_carry_flag(),
+                instructions::CLD_IMP => self.clear_decimal_mode(),
+                instructions::CLI_IMP => self.clear_interrupt_disable(),
+                instructions::CLV_IMP => self.clear_overflow_flag(),
+                instructions::SEC_IMP => self.set_carry_flag(),
                 instructions::SED_IMP => self.set_decimal_mode(),
                 instructions::SEI_IMP => self.set_interrupt_disable(),
                 instructions::NOP_IMP => self.nop(),
@@ -70,17 +75,7 @@ impl Mos6502 {
         }
     }
 
-    fn lda_set_status(&mut self) {
-        self.status = match self.acc == 0 {
-            true => Mos6502Flags::Z.set(self.status),
-            false => Mos6502Flags::Z.unset(self.status),
-        };
-        self.status = match self.acc & 0b1000_0000 != 0 {
-            true => Mos6502Flags::N.set(self.status),
-            false => Mos6502Flags::N.unset(self.status),
-        };
-        todo!("update cycles");
-    }
+    ////////// HELPER FUNCTIONS //////////
 
     fn fetch_byte(&mut self, mem: &mut Memory) -> Byte {
         let byte = mem.get_byte(self.pc.into());
@@ -89,13 +84,54 @@ impl Mos6502 {
         byte.clone()
     }
 
+    ////////// UPDATE STATUS FUNCTIONS //////////
+
+    fn lda_set_status(&mut self) {
+        match self.acc == 0 {
+            true => Mos6502Flags::Z.set(&mut self.status),
+            false => Mos6502Flags::Z.unset(&mut self.status),
+        };
+        match self.acc & 0b1000_0000 != 0 {
+            true => Mos6502Flags::N.set(&mut self.status),
+            false => Mos6502Flags::N.unset(&mut self.status),
+        };
+        todo!("update cycles");
+    }
+
+    ////////// CPU FUNCTIONS //////////
+
+    fn clear_carry_flag(&mut self) {
+        Mos6502Flags::C.unset(&mut self.status);
+        self.cycles -= 2;
+    }
+
+    fn clear_decimal_mode(&mut self) {
+        Mos6502Flags::D.unset(&mut self.status);
+        self.cycles -= 2;
+    }
+
+    fn clear_interrupt_disable(&mut self) {
+        Mos6502Flags::I.unset(&mut self.status);
+        self.cycles -= 2;
+    }
+
+    fn clear_overflow_flag(&mut self) {
+        Mos6502Flags::V.unset(&mut self.status);
+        self.cycles -= 2;
+    }
+
+    fn set_carry_flag(&mut self) {
+        Mos6502Flags::C.set(&mut self.status);
+        self.cycles -= 2;
+    }
+
     fn set_decimal_mode(&mut self) {
-        self.status = Mos6502Flags::D.set(self.status);
+        Mos6502Flags::D.set(&mut self.status);
         self.cycles -= 2;
     }
 
     fn set_interrupt_disable(&mut self) {
-        self.status = Mos6502Flags::I.set(self.status);
+        Mos6502Flags::I.set(&mut self.status);
         self.cycles -= 2;
     }
 
