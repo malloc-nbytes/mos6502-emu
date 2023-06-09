@@ -70,7 +70,7 @@ impl Mos6502 {
                 instructions::SED_IMP => self.set_decimal_mode(instructions::SED_IMP_CCOST),
                 instructions::SEI_IMP => self.set_interrupt_disable(instructions::SEI_IMP_CCOST),
                 instructions::NOP_IMP => self.nop(instructions::NOP_IMP_CCOST),
-                _ => panic!("Unhandled instruction {}", instr),
+                _ => panic!("Unhandled instruction {instr}"),
             }
         }
     }
@@ -94,8 +94,10 @@ impl Mos6502 {
     }
 
     fn fetch_word(&mut self, mem: &mut Memory) -> Word {
-        let w1 = mem.get_byte(self.pc as usize) as Word;
-        let w2 = mem.get_byte((self.pc + 1) as usize) as Word;
+        // let w1 = mem.get_byte(self.pc as usize) as Word;
+        // let w2 = mem.get_byte((self.pc + 1) as usize) as Word;
+        let w1 = u16::from(mem.get_byte(self.pc as usize));
+        let w2 = u16::from(mem.get_byte((self.pc + 1) as usize));
         self.pc += 2;
         self.cycles -= 2;
         (w1 << 8) | w2
@@ -104,14 +106,16 @@ impl Mos6502 {
     ////////// UPDATE STATUS FUNCTIONS //////////
 
     fn lda_set_status(&mut self) {
-        match self.acc == 0 {
-            true => Mos6502Flags::Z.set(&mut self.status),
-            false => Mos6502Flags::Z.unset(&mut self.status),
-        };
-        match self.acc & 0b1000_0000 != 0 {
-            true => Mos6502Flags::N.set(&mut self.status),
-            false => Mos6502Flags::N.unset(&mut self.status),
-        };
+        if self.acc == 0 {
+            Mos6502Flags::Z.set(&mut self.status);
+        } else {
+            Mos6502Flags::Z.unset(&mut self.status);
+        }
+        if self.acc & 0b1000_0000 == 0 {
+            Mos6502Flags::N.unset(&mut self.status);
+        } else {
+            Mos6502Flags::N.set(&mut self.status);
+        }
         todo!("update cycles");
     }
 

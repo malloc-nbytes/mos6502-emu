@@ -1,3 +1,5 @@
+ #![warn(clippy::pedantic)]
+
 mod instructions;
 mod mos6502;
 mod memory;
