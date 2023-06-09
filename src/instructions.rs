@@ -6,6 +6,7 @@
 type Byte = u8;
 
 /* `~` = +1 if page is crossed */
+/* `*` = +1 if branch is taken */
 
 ////////// Load Accumulator with Memory (LDA) //////////
 //
@@ -497,7 +498,7 @@ pub const AND_ZPX: Byte = 0x25;
 // Opcode:          $21
 // Bytes:           2
 // Cycles:          6
-pub const AND_ZPX: Byte = 0x21;
+pub const AND_ZPX_IND: Byte = 0x21;
 
 // Addressing Mode: Zero Page Indirect Y-Index
 // Opcode:          $31
@@ -828,7 +829,128 @@ pub const SBC_ZPX_IND: Byte = 0xE1;
 pub const SBC_ZPY_IND: Byte = 0xF1;
 
 ////////// Decrement Memory by One (DEC) //////////
-// todo
+//
+// Status Flags Affected: {N, Z}
+
+// Addressing Mode: Absolute
+// Opcode:          $CE
+// Bytes:           3
+// Cycles:          6
+pub const DEC_ABS: Byte = 0xCE;
+
+// Addressing Mode: X-Indexed Absolute
+// Opcode:          $DE
+// Bytes:           3
+// Cycles:          7
+pub const DEC_ABSX: Byte = 0xDE;
+
+// Addressing Mode: Zero Page
+// Opcode:          $C6
+// Bytes:           2
+// Cycles:          5
+pub const DEC_ZP: Byte = 0xC6;
+
+// Addressing Mode: X-Indexed Zero Page
+// Opcode:          $D6
+// Bytes:           2
+// Cycles:          6
+pub const DEC_ZPX: Byte = 0xD6;
+
+////////// Decrement Index Register X by One (DEX) //////////
+//
+// Status Flags Affected: {N, Z}
+
+// Addressing Mode: Implied
+// Opcode:          $CA
+// Bytes:           1
+// Cycles:          2
+pub const DEX_IMP: Byte = 0xCA;
+
+////////// Decrement Index Register Y by One (DEY) //////////
+//
+// Status Flags Affected: {N, Z}
+
+// Addressing Mode: Implied
+// Opcode:          $88
+// Bytes:           1
+// Cycles:          2
+pub const DEY_IMP: Byte = 0x88;
+
+////////// Increment Memory by One (INC) //////////
+//
+// Status Flags Affected: {N, Z}
+
+// Addressing Mode: Absolute
+// Opcode:          $EE
+// Bytes:           3
+// Cycles:          6
+pub const INC_ABS: Byte = 0xEE;
+
+// Addressing Mode: X-Indexed Absolute
+// Opcode:          $FE
+// Bytes:           3
+// Cycles:          7
+pub const INC_ABSX: Byte = 0xFE;
+
+// Addressing Mode: Zero Page
+// Opcode:          $E6
+// Bytes:           2
+// Cycles:          5
+pub const INC_ZP: Byte = 0xE6;
+
+// Addressing Mode: X-Indexed Zero Page
+// Opcode:          $F6
+// Bytes:           2
+// Cycles:          6
+pub const INC_ZPX: Byte = 0xF6;
+
+////////// Increment Index Register X by One (INX) //////////
+//
+// Status Flags Affected: {N, Z}
+
+// Addressing Mode: Implied
+// Opcode:          $E8
+// Bytes:           1
+// Cycles:          2
+pub const INX_IMP: Byte = 0xE8;
+
+////////// Increment Index Register Y by One (INY) //////////
+//
+// Status Flags Affected: {N, Z}
+
+// Addressing Mode: Implied
+// Opcode:          $C8
+// Bytes:           1
+// Cycles:          2
+pub const INY_IMP: Byte = 0xC8;
+
+////////// Break Command (BRK) //////////
+//
+// Status Flags Affected: {I}
+//
+// Note: If an IRQ happens at the same time as BRK, the BRK will be ignored.
+
+// Addressing Mode: Implied
+// Opcode:          $00
+// Bytes:           1
+// Cycles:          7
+pub const BRK_IMP: Byte = 0x00;
+
+////////// JMP Indirect (JMP) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Absolute
+// Opcode:          $4C
+// Bytes:           3
+// Cycles:          3
+pub const JMP_ABS: Byte = 0x4C;
+
+// Addressing Mode: Absolute Indirect
+// Opcode:          $6C
+// Bytes:           3
+// Cycles:          5
+pub const JMP_ABS_IND: Byte = 0x6C;
 
 ////////// Jump to Subroutine (JSR) //////////
 //
@@ -839,3 +961,155 @@ pub const SBC_ZPY_IND: Byte = 0xF1;
 // Bytes:           3
 // Cycles:          6
 pub const JMP_SR: Byte = 0x20;
+
+////////// Return From Interrupt (RTI) //////////
+//
+// Status Flags Affected: {N, V, D, I, Z, C}
+
+// Addressing Mode: Implied
+// Opcode:          $40
+// Bytes:           1
+// Cycles:          6
+pub const RTI_IMP: Byte = 0x40;
+
+////////// Return From Subroutine (RTS) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Implied
+// Opcode:          $60
+// Bytes:           1
+// Cycles:          6
+pub const RTS_IMP: Byte = 0x60;
+
+////////// Branch on Carry Clear (BCC) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Relative
+// Opcode:          $90
+// Bytes:           2
+// Cycles:          ~*2
+pub const BCC_REL: Byte = 0x90;
+
+////////// Branch on Carry Set (BCS) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Relative
+// Opcode:          $B0
+// Bytes:           2
+// Cycles:          ~*2
+pub const BCS_REL: Byte = 0xB0;
+
+////////// Branch on Result Zero (BEQ) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Relative
+// Opcode:          $F0
+// Bytes:           2
+// Cycles:          ~*2
+pub const BEQ_REL: Byte = 0xF0;
+
+////////// Branch on Result Minus (BMI) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Relative
+// Opcode:          $30
+// Bytes:           2
+// Cycles:          ~*2
+pub const BMI_REL: Byte = 0x30;
+
+////////// Branch on Result Not Zero (BNE) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Relative
+// Opcode:          $D0
+// Bytes:           2
+// Cycles:          ~*2
+pub const BNE_REL: Byte = 0xD0;
+
+////////// Branch on Result Plus (BPL) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Relative
+// Opcode:          $10
+// Bytes:           2
+// Cycles:          ~*2
+pub const BPL_REL: Byte = 0x10;
+
+////////// Branch on Overflow Clear (BVC) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Relative
+// Opcode:          $50
+// Bytes:           2
+// Cycles:          ~*2
+pub const BVC_REL: Byte = 0x50;
+
+////////// Branch on Overflow Set (BVS) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Relative
+// Opcode:          $70
+// Bytes:           2
+// Cycles:          ~*2
+pub const BVS_REL: Byte = 0x70;
+
+////////// Clear Carry Flag (CLC) //////////
+//
+// Status Flags Affected: {(C: 0)}
+
+// Addressing Mode: Implied
+// Opcode:          $18
+// Bytes:           1
+// Cycles:          2
+pub const CLC_IMP: Byte = 0x18;
+
+////////// Clear Decimal Mode (CLD) //////////
+//
+// Status Flags Affected: {(D: 0)}
+//
+// Note: The value of the decimal mode flag is indeterminate after a RESET.
+
+// Addressing Mode: Implied
+// Opcode:          $D8
+// Bytes:           1
+// Cycles:          2
+pub const CLD_IMP: Byte = 0xD8;
+
+////////// Clear Interrupt Disable Bit (CLI) //////////
+//
+// Status Flags Affected: {(I: 0)}
+
+// Addressing Mode: Implied
+// Opcode:          $58
+// Bytes:           1
+// Cycles:          2
+pub const CLI_IMP: Byte = 0x58;
+
+////////// Clear Overflow Flag (CLV) //////////
+//
+// Status Flags Affected: {(V: 0)}
+
+// Addressing Mode: Implied
+// Opcode:          $B8
+// Bytes:           1
+// Cycles:          2
+pub const CLV_IMP: Byte = 0xB8;
+
+////////// Set Carry Flag (SEC) //////////
+//
+// Status Flags Affected: {(C: 1)}
+
+// Addressing Mode: Implied
+// Opcode:          $38
+// Bytes:           1
+// Cycles:          2
+pub const SEC_IMP: Byte = 0x38;
