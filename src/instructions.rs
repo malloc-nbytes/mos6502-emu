@@ -1,6 +1,8 @@
 // Reference(s):
 //  https://www.pagetable.com/c64ref/6502/?tab=2
 
+// (ﾉಥДಥ)ﾉ ︵┻━┻･/
+
 type Byte = u8;
 
 /* `~` = +1 if page is crossed */
@@ -274,6 +276,148 @@ pub const TXS_IMP: Byte = 0x9A;
 // Bytes:           1
 // Cycles:          2
 pub const TYA_IMP: Byte = 0x98;
+
+////////// Push Accumulator on Stack (PHA) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Implied
+// Opcode:          $48
+// Bytes:           1
+// Cycles:          3
+pub const PHA_IMP: Byte = 0x48;
+
+////////// Push Processor Status on Stack (PHP) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Implied
+// Opcode:          $08
+// Bytes:           1
+// Cycles:          3
+pub const PHP_IMP: Byte = 0x08;
+
+////////// Pull Accumulator from Stack (PLA) //////////
+//
+// Status Flags Affected: {N, Z}
+
+// Addressing Mode: Implied
+// Opcode:          $68
+// Bytes:           1
+// Cycles:          4
+pub const PLA_IMP: Byte = 0x68;
+
+////////// Pull Processor Status from Stack (PLP) //////////
+//
+// Status Flags Affected: {N, V, D, I, Z, C}
+
+// Addressing Mode: Implied
+// Opcode:          $28
+// Bytes:           1
+// Cycles:          4
+pub const PLP_IMP: Byte = 0x28;
+
+////////// Arithmetic Shift Left (ASL) //////////
+//
+// Status Flags Affected: {N, Z, C}
+
+// Addressing Mode: Accumulator
+// Opcode:          $0A
+// Bytes:           1
+// Cycles:          2
+pub const ASL_ACC: Byte = 0x0A;
+
+// Addressing Mode: Absolute
+// Opcode:          $0E
+// Bytes:           3
+// Cycles:          6
+pub const ASL_ABS: Byte = 0x0E;
+
+// Addressing Mode: X-Indexed Absolute
+// Opcode:          $1E
+// Bytes:           3
+// Cycles:          7
+pub const ASL_ABSX: Byte = 0x1E;
+
+// Addressing Mode: Zero Page
+// Opcode:          $06
+// Bytes:           2
+// Cycles:          5
+pub const ASL_ZP: Byte = 0x06;
+
+// Addressing Mode: X-Indexed Zero Page
+// Opcode:          $16
+// Bytes:           2
+// Cycles:          6
+pub const ASL_ZPX: Byte = 0x16;
+
+////////// Logical Shift Right (LSR) //////////
+//
+// Status Flags Affected: {(N: 0), Z, C}
+
+// Addressing Mode: Accumulator
+// Opcode:          $4A
+// Bytes:           1
+// Cycles:          2
+pub const LSR_ACC: Byte = 0x4A;
+
+// Addressing Mode: Absolute
+// Opcode:          $4E
+// Bytes:           3
+// Cycles:          6
+pub const LSR_ABS: Byte = 0x4E;
+
+// Addressing Mode: X-Indexed Absolute
+// Opcode:          $5E
+// Bytes:           3
+// Cycles:          7
+pub const LSR_ABSX: Byte = 0x5E;
+
+// Addressing Mode: Zero Page
+// Opcode:          $46
+// Bytes:           2
+// Cycles:          5
+pub const LSR_ZP: Byte = 0x46;
+
+// Addressing Mode: X-Indexed Zero Page
+// Opcode:          $56
+// Bytes:           2
+// Cycles:          6
+pub const LSR_ZPX: Byte = 0x56;
+
+////////// Rotate Left (ROL) //////////
+//
+// Status Flags Affected: {N, Z, C}
+
+// Addressing Mode: Accumulator
+// Opcode:          $2A
+// Bytes:           1
+// Cycles:          2
+pub const ROL_ACC: Byte = 0x2A;
+
+// Addressing Mode: Absolute
+// Opcode:          $2E
+// Bytes:           3
+// Cycles:          6
+pub const ROL_ABS: Byte = 0x2E;
+
+// Addressing Mode: X-Indexed Absolute
+// Opcode:          $3E
+// Bytes:           3
+// Cycles:          7
+pub const ROL_ABSX: Byte = 0x3E;
+
+// Addressing Mode: Zero Page
+// Opcode:          $26
+// Bytes:           2
+// Cycles:          5
+pub const ROL_ZP: Byte = 0x26;
+
+// Addressing Mode: X-Indexed Zero Page
+// Opcode:          $36
+// Bytes:           2
+// Cycles:          6
+pub const ROL_ZPX: Byte = 0x36;
 
 ////////// Jump to Subroutine (JSR) //////////
 //

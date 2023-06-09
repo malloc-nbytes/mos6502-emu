@@ -67,10 +67,6 @@ impl Mos6502 {
         while cycles > 0 {
             let instr: Byte = self.fetch_byte(mem, &mut cycles);
             match instr {
-                instructions::LDA_IMM => todo!(),
-                instructions::LDA_ZP => todo!(),
-                instructions::LDA_ZPX => todo!(),
-                instructions::JMP_SR => todo!(),
                 _ => panic!("Unhandled instruction {}", instr),
             }
         }
