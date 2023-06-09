@@ -1,15 +1,11 @@
 use crate::memory::Memory;
+use crate::instructions;
 
 type Byte = u8;
 type Word = u16;
 
-// LDA //
-const LDA_IMM: Byte = 0xA9; // Instruction Load Accumulator Immediate Mode.
-const LDA_ZP:  Byte = 0xA5; // Instruction Load Accumulator Zero Page.
-const LDA_ZPX: Byte = 0xB5; // Instruction Load Accumulator Zero Page X.
-
-// JMP //
-const JMP_SR: Byte = 0x20; // Instruction Jump to Subroutine.
+const STACKPTR_BEGIN:        Word = 0x0100;
+const PROGRAM_COUNTER_BEGIN: Word = 0xFFFC;
 
 enum Mos6502Flags {
     C = 0, // Carry bit.
@@ -51,9 +47,10 @@ impl std::fmt::Display for Mos6502 {
 impl Mos6502 {
     pub fn new() -> Self {
         Self {
-            acc: 0x00, x: 0x00,
-            y: 0x00, stackptr: 0x0100,
-            status: 0x00, pc: 0xFFFC,
+            acc: 0x00, x: 0x00, y: 0x00,
+            status: 0x00,
+            stackptr: STACKPTR_BEGIN,
+            pc: PROGRAM_COUNTER_BEGIN,
         }
     }
 
@@ -70,10 +67,10 @@ impl Mos6502 {
         while cycles > 0 {
             let instr: Byte = self.fetch_byte(mem, &mut cycles);
             match instr {
-                LDA_IMM => todo!(),
-                LDA_ZP => todo!(),
-                LDA_ZPX => todo!(),
-                JMP_SR => todo!(),
+                instructions::LDA_IMM => todo!(),
+                instructions::LDA_ZP => todo!(),
+                instructions::LDA_ZPX => todo!(),
+                instructions::JMP_SR => todo!(),
                 _ => panic!("Unhandled instruction {}", instr),
             }
         }
