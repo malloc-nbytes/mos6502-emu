@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 // Reference(s):
 //  https://www.pagetable.com/c64ref/6502/?tab=2
 
