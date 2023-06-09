@@ -62,14 +62,14 @@ impl Mos6502 {
         while self.cycles > 0 {
             let instr: Byte = self.fetch_byte(mem);
             match instr {
-                instructions::CLC_IMP => self.clear_carry_flag(),
-                instructions::CLD_IMP => self.clear_decimal_mode(),
-                instructions::CLI_IMP => self.clear_interrupt_disable(),
-                instructions::CLV_IMP => self.clear_overflow_flag(),
-                instructions::SEC_IMP => self.set_carry_flag(),
-                instructions::SED_IMP => self.set_decimal_mode(),
-                instructions::SEI_IMP => self.set_interrupt_disable(),
-                instructions::NOP_IMP => self.nop(),
+                instructions::CLC_IMP => self.clear_carry_flag(instructions::CLC_IMP_CCOST),
+                instructions::CLD_IMP => self.clear_decimal_mode(instructions::CLD_IMP_CCOST),
+                instructions::CLI_IMP => self.clear_interrupt_disable(instructions::CLI_IMP_CCOST),
+                instructions::CLV_IMP => self.clear_overflow_flag(instructions::CLV_IMP_CCOST),
+                instructions::SEC_IMP => self.set_carry_flag(instructions::SEC_IMP_CCOST),
+                instructions::SED_IMP => self.set_decimal_mode(instructions::SED_IMP_CCOST),
+                instructions::SEI_IMP => self.set_interrupt_disable(instructions::SEI_IMP_CCOST),
+                instructions::NOP_IMP => self.nop(instructions::NOP_IMP_CCOST),
                 _ => panic!("Unhandled instruction {}", instr),
             }
         }
@@ -77,11 +77,24 @@ impl Mos6502 {
 
     ////////// HELPER FUNCTIONS //////////
 
-    fn fetch_byte(&mut self, mem: &mut Memory) -> Byte {
-        let byte = mem.get_byte(self.pc.into());
+    fn use_cycles(&mut self, c: u32) {
+        assert!(self.cycles > 0);
+        self.cycles -= c;
+    }
+
+    fn fetch_byte(&mut self, mem: &Memory) -> Byte {
+        let byte = mem.get_byte(self.pc as usize);
         self.pc += 1;
         self.cycles -= 1;
         byte.clone()
+    }
+
+    fn fetch_word(&mut self, mem: &mut Memory) -> Word {
+        let w1 = mem.get_byte(self.pc as usize) as Word;
+        let w2 = mem.get_byte((self.pc + 1) as usize) as Word;
+        self.pc += 2;
+        self.cycles -= 2;
+        (w1 << 8) | w2
     }
 
     ////////// UPDATE STATUS FUNCTIONS //////////
@@ -100,42 +113,42 @@ impl Mos6502 {
 
     ////////// CPU FUNCTIONS //////////
 
-    fn clear_carry_flag(&mut self) {
+    fn clear_carry_flag(&mut self, cycle_cost: u32) {
         Mos6502Flags::C.unset(&mut self.status);
-        self.cycles -= 2;
+        self.use_cycles(cycle_cost);
     }
 
-    fn clear_decimal_mode(&mut self) {
+    fn clear_decimal_mode(&mut self, cycle_cost: u32) {
         Mos6502Flags::D.unset(&mut self.status);
-        self.cycles -= 2;
+        self.use_cycles(cycle_cost);
     }
 
-    fn clear_interrupt_disable(&mut self) {
+    fn clear_interrupt_disable(&mut self, cycle_cost: u32) {
         Mos6502Flags::I.unset(&mut self.status);
-        self.cycles -= 2;
+        self.use_cycles(cycle_cost);
     }
 
-    fn clear_overflow_flag(&mut self) {
+    fn clear_overflow_flag(&mut self, cycle_cost: u32) {
         Mos6502Flags::V.unset(&mut self.status);
-        self.cycles -= 2;
+        self.use_cycles(cycle_cost);
     }
 
-    fn set_carry_flag(&mut self) {
+    fn set_carry_flag(&mut self, cycle_cost: u32) {
         Mos6502Flags::C.set(&mut self.status);
-        self.cycles -= 2;
+        self.use_cycles(cycle_cost);
     }
 
-    fn set_decimal_mode(&mut self) {
+    fn set_decimal_mode(&mut self, cycle_cost: u32) {
         Mos6502Flags::D.set(&mut self.status);
-        self.cycles -= 2;
+        self.use_cycles(cycle_cost);
     }
 
-    fn set_interrupt_disable(&mut self) {
+    fn set_interrupt_disable(&mut self, cycle_cost: u32) {
         Mos6502Flags::I.set(&mut self.status);
-        self.cycles -= 2;
+        self.use_cycles(cycle_cost);
     }
 
-    fn nop(&mut self) {
-        self.cycles -= 2;
+    fn nop(&mut self, cycle_cost: u32) {
+        self.use_cycles(cycle_cost);
     }
 }
