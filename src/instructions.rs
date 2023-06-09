@@ -125,14 +125,80 @@ pub const LDY_ZP: Byte = 0xA4;
 // Cycles:          4
 pub const LDY_ZPX: Byte = 0xB4;
 
+////////// Store Accumulator in Memory (STA) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Absolute
+// Opcode:          $8D
+// Bytes:           3
+// Cycles:          4
+pub const STA_ABS: Byte = 0x8D;
+
+// Addressing Mode: X-Indexed Absolute
+// Opcode:          $9D
+// Bytes:           3
+// Cycles:          5
+pub const STA_ABSX: Byte = 0x9D;
+
+// Addressing Mode: Y-Indexed Absolute
+// Opcode:          $99
+// Bytes:           3
+// Cycles:          5
+pub const STA_ABSY: Byte = 0x99;
+
+// Addressing Mode: Zero Page
+// Opcode:          $85
+// Bytes:           2
+// Cycles:          3
+pub const STA_ZP: Byte = 0x85;
+
+// Addressing Mode: X-Indexed Zero Page
+// Opcode:          $95
+// Bytes:           2
+// Cycles:          4
+pub const STA_ZPX: Byte = 0x95;
+
+// Addressing Mode: X-Indexed Zero Page Indirect
+// Opcode:          $81
+// Bytes:           2
+// Cycles:          6
+pub const STA_ZPX_IND: Byte = 0x81;
+
+// Addressing Mode: Zero Page Indirect Y-Indexed
+// Opcode:          $91
+// Bytes:           2
+// Cycles:          6
+pub const STA_ZPY_IND: Byte = 0x91;
+
+////////// Store Index Register X in Memory (STX) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Absolute
+// Opcode:          $91
+// Bytes:           3
+// Cycles:          4
+pub const STX_ABS: Byte = 0x91;
+
+// Addressing Mode: Zero Page
+// Opcode:          $86
+// Bytes:           2
+// Cycles:          3
+pub const STX_ZP: Byte = 0x86;
+
+// Addressing Mode: Y-Indexed Zero Page
+// Opcode:          $96
+// Bytes:           2
+// Cycles:          4
+pub const STX_ZPY: Byte = 0x96;
+
 ////////// Jump to Subroutine (JSR) //////////
 //
-// Status Flags Affected: {}
+// Status Flags Affected: ∅
 
 // Addressing Mode: Absolute
 // Opcode:          $20
 // Bytes:           3
 // Cycles:          6
 pub const JMP_SR: Byte = 0x20;
-
-
