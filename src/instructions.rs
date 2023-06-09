@@ -1113,3 +1113,33 @@ pub const CLV_IMP: Byte = 0xB8;
 // Bytes:           1
 // Cycles:          2
 pub const SEC_IMP: Byte = 0x38;
+
+////////// Set Decimal Mode (SED) //////////
+//
+// Status Flags Affected: {(D: 1)}
+
+// Addressing Mode: Implied
+// Opcode:          $F8
+// Bytes:           1
+// Cycles:          2
+pub const SED_IMP: Byte = 0xF8;
+
+////////// Set Interrupt Disable Status (SEI) //////////
+//
+// Status Flags Affected: {(I: 1)}
+
+// Addressing Mode: Implied
+// Opcode:          $78
+// Bytes:           1
+// Cycles:          2
+pub const SEI_IMP: Byte = 0x78;
+
+////////// No Operation (NOP) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Implied
+// Opcode:          $EA
+// Bytes:           1
+// Cycles:          2
+pub const NOP_IMP: Byte = 0xEA;

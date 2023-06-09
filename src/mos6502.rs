@@ -54,15 +54,6 @@ impl Mos6502 {
         }
     }
 
-    pub fn dump(&self) {
-        println!("acc: {}",      self.acc);
-        println!("x: {}",        self.x);
-        println!("y: {}",        self.y);
-        println!("status: {}",   self.status);
-        println!("stackptr: {}", self.stackptr);
-        println!("pc: {}",       self.pc);
-    }
-
     pub fn exe(&mut self, mem: &mut Memory, mut cycles: u32) {
         while cycles > 0 {
             let instr: Byte = self.fetch_byte(mem, &mut cycles);
@@ -89,8 +80,4 @@ impl Mos6502 {
         *cycles -= 1;
         byte.clone()
     }
-
 }
-
-
-
