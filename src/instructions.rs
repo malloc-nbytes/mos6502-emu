@@ -193,6 +193,88 @@ pub const STX_ZP: Byte = 0x86;
 // Cycles:          4
 pub const STX_ZPY: Byte = 0x96;
 
+////////// Store Index Register Y in Memory (STY) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Absolute
+// Opcode:          $8C
+// Bytes:           3
+// Cycles:          4
+pub const STY_ABS: Byte = 0x8C;
+
+// Addressing Mode: Zero Page
+// Opcode:          $84
+// Bytes:           2
+// Cycles:          3
+pub const STY_ZP: Byte = 0x84;
+
+// Addressing Mode: X-Indexed Zero Page
+// Opcode:          $94
+// Bytes:           2
+// Cycles:          4
+pub const STY_ZPX: Byte = 0x94;
+
+////////// Transfer Accumulator to Index X (TAX) //////////
+//
+// Status Flags Affected: {N, Z}
+
+// Addressing Mode: Implied
+// Opcode:          $AA
+// Bytes:           1
+// Cycles:          2
+pub const TAX_IMP: Byte = 0xAA;
+
+////////// Transfer Accumulator to Index Y //////////
+//
+// Status Flags Affected: {N, Z}
+
+// Addressing Mode: Implied
+// Opcode:          $A8
+// Bytes:           1
+// Cycles:          2
+pub const TAY_IMP: Byte = 0xA8;
+
+////////// Transfer Stack Pointer to Index X (TSX) //////////
+//
+// Status Flags Affected: {N, Z}
+
+// Addressing Mode: Implied
+// Opcode:          $BA
+// Bytes:           1
+// Cycles:          2
+pub const TSX_IMP: Byte = 0xBA;
+
+////////// Transfer Index X to Accumulator (TXA) //////////
+//
+// Status Flags Affected: {N, Z}
+
+// Addressing Mode: Implied
+// Opcode:          $8A
+// Bytes:           1
+// Cycles:          2
+pub const TXA_IMP: Byte = 0x8A;
+
+////////// Transfer Index X to Stack Pointer (TXS) //////////
+//
+// Status Flags Affected: ∅
+
+// Addressing Mode: Implied
+// Opcode:          $9A
+// Bytes:           1
+// Cycles:          2
+pub const TXS_IMP: Byte = 0x9A;
+
+////////// Transfer Index Y to Accumulator (TYA) //////////
+//
+// Status Flags Affected: {N, Z}
+
+// Addressing Mode: Implied
+// Opcode:          $98
+// Bytes:           1
+// Cycles:          2
+pub const TYA_IMP: Byte = 0x98;
+
 ////////// Jump to Subroutine (JSR) //////////
 //
 // Status Flags Affected: ∅
