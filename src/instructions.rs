@@ -213,7 +213,7 @@ pub const STA_ZPY_IND_CCOST: u32 = 6;
 // Opcode:          $91
 // Bytes:           3
 // Cycles:          4
-pub const STX_ABS: Byte = 0x91;
+pub const STX_ABS: Byte = 0x8E;
 pub const STX_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
@@ -1131,6 +1131,7 @@ pub const RTS_IMP_CCOST: u32 = 6;
 // Opcode:          $90
 // Bytes:           2
 // Cycles:          ~*2
+pub const BCC_REL: Byte = 0x90;
 pub const BCC_REL_CCOST: u32 = 2;
 
 ////////// Branch on Carry Set (BCS) //////////

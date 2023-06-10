@@ -48,7 +48,7 @@ impl std::fmt::Display for Mos6502 {
     }
 }
 
-const LOOKUP_TBL_SIZE: usize = 121;
+const LOOKUP_TBL_SIZE: usize = 150;
 
 const LOOKUP: [Option<fn(&mut Mos6502)>; LOOKUP_TBL_SIZE] = [
     Some(Mos6502::brk_imp),
@@ -172,6 +172,50 @@ const LOOKUP: [Option<fn(&mut Mos6502)>; LOOKUP_TBL_SIZE] = [
     Some(Mos6502::ror_zpx),
     None,
     Some(Mos6502::sei_imp),
+    Some(Mos6502::adc_absy),
+    None,
+    None,
+    None,
+    Some(Mos6502::adc_absx),
+    Some(Mos6502::ror_absx),
+    None,
+    None,
+    Some(Mos6502::sta_zpx_ind),
+    None,
+    None,
+    Some(Mos6502::sty_zp),
+    Some(Mos6502::sta_zp),
+    Some(Mos6502::stx_zp),
+    None,
+    Some(Mos6502::dey_imp),
+    None,
+    Some(Mos6502::txa_imp),
+    None,
+    Some(Mos6502::sty_abs),
+    Some(Mos6502::sta_abs),
+    Some(Mos6502::stx_abs),
+    None,
+    Some(Mos6502::bcc_rel),
+    Some(Mos6502::sta_zpy_ind),
+    None,
+    None,
+    Some(Mos6502::sty_zpx),
+    Some(Mos6502::sta_zpx),
+    Some(Mos6502::stx_zpy),
+    None,
+    Some(Mos6502::tya_imp),
+    Some(Mos6502::sta_absy),
+    Some(Mos6502::txs_imp),
+    None,
+    None,
+    Some(Mos6502::sta_absx),
+    None,
+    None,
+    Some(Mos6502::ldy_imm),
+    Some(Mos6502::lda_zpx_ind),
+    Some(Mos6502::ldx_imm),
+    None,
+    Some(Mos6502::ldy_zp),
 ];
 
 impl Mos6502 {
@@ -543,6 +587,110 @@ impl Mos6502 {
         Mos6502Flags::I.set(&mut self.status);
         self.use_cycles(instructions::SEI_IMP_CCOST);
     }
+
+    fn adc_absy(&mut self) {
+        todo!()
+    }
+
+    fn adc_absx(&mut self) {
+        todo!()
+    }
+
+    fn ror_absx(&mut self) {
+        todo!()
+    }
+
+    fn sta_zpx_ind(&mut self) {
+        todo!()
+    }
+
+    fn sty_zp(&mut self) {
+        todo!()
+    }
+
+    fn sta_zp(&mut self) {
+        todo!()
+    }
+
+    fn stx_zp(&mut self) {
+        todo!()
+    }
+
+    fn dey_imp(&mut self) {
+        todo!()
+    }
+
+    fn txa_imp(&mut self) {
+        todo!()
+    }
+
+    fn sty_abs(&mut self) {
+        todo!()
+    }
+
+    fn sta_abs(&mut self) {
+        todo!()
+    }
+
+    fn stx_abs(&mut self) {
+        todo!()
+    }
+
+    fn bcc_rel(&mut self) {
+        todo!()
+    }
+
+    fn sta_zpy_ind(&mut self) {
+        todo!()
+    }
+
+    fn sty_zpx(&mut self) {
+        todo!()
+    }
+
+    fn sta_zpx(&mut self) {
+        todo!()
+    }
+
+    fn stx_zpy(&mut self) {
+        todo!()
+    }
+
+    fn tya_imp(&mut self) {
+        todo!()
+    }
+
+    fn sta_absy(&mut self) {
+        todo!()
+    }
+
+    fn txs_imp(&mut self) {
+        todo!()
+    }
+
+    fn sta_absx(&mut self) {
+        todo!()
+    }
+
+    fn ldy_imm(&mut self) {
+        todo!()
+    }
+
+    fn lda_zpx_ind(&mut self) {
+        todo!()
+    }
+
+    fn ldx_imm(&mut self) {
+        todo!()
+    }
+
+    fn ldy_zp(&mut self) {
+        todo!()
+    }
+
+
+
+
 
     fn lda_imm(&mut self) {
         self.acc = self.fetch_byte();
