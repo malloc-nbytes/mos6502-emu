@@ -564,7 +564,7 @@ pub const AND_ZP_CCOST: u32 = 3;
 // Opcode:          $35
 // Bytes:           2
 // Cycles:          4
-pub const AND_ZPX: Byte = 0x25;
+pub const AND_ZPX: Byte = 0x35;
 pub const AND_ZPX_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Zero Page Indirect
@@ -1163,6 +1163,7 @@ pub const BEQ_REL_CCOST: u32 = 2;
 // Opcode:          $30
 // Bytes:           2
 // Cycles:          ~*2
+pub const BMI_REL: Byte = 0x30;
 pub const BMI_REL_CCOST: u32 = 2;
 
 ////////// Branch on Result Not Zero (BNE) //////////
