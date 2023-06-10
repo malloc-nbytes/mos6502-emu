@@ -20,12 +20,14 @@ enum Mos6502Flags {
 }
 
 impl Mos6502Flags {
-    pub fn set(self, status: &mut Byte) {
-        *status |= self as Byte
+    pub fn set(self, mos: &mut Mos6502) {
+        mos.status |= self as Byte;
+        mos.cycle();
     }
 
-    pub fn clear(self, status: &mut Byte) {
-        *status &= !(self as Byte)
+    pub fn clear(self, mos: &mut Mos6502) {
+        mos.status &= !(self as Byte);
+        mos.cycle();
     }
 }
 
@@ -323,10 +325,6 @@ impl Mos6502 {
         }
     }
 
-    fn cycle(&mut self) {
-        self.cycles -= 1;
-    }
-
     pub fn reset(&mut self, cycles: Option<u32>) {
         (self.acc, self.x, self.y, self.status) = (0x00, 0x00, 0x00, 0x00);
         self.cycles = match cycles { Some(c) => c, _ => 0 };
@@ -344,6 +342,10 @@ impl Mos6502 {
                 println!("Illegal opcode: {opcode}");
             }
         }
+    }
+
+    fn cycle(&mut self) {
+        self.cycles -= 1;
     }
 
     ////////// HELPER FUNCTIONS //////////
@@ -381,14 +383,14 @@ impl Mos6502 {
 
     fn lda_set_status(&mut self) {
         if self.acc == 0 {
-            Mos6502Flags::Z.set(&mut self.status);
+            Mos6502Flags::Z.set(self);
         } else {
-            Mos6502Flags::Z.clear(&mut self.status);
+            Mos6502Flags::Z.clear(self);
         }
         if self.acc & (1u8 << 7) == 0 {
-            Mos6502Flags::N.clear(&mut self.status);
+            Mos6502Flags::N.clear(self);
         } else {
-            Mos6502Flags::N.set(&mut self.status);
+            Mos6502Flags::N.set(self);
         }
         self.cycle();
     }
@@ -492,7 +494,7 @@ impl Mos6502 {
     }
 
     fn clc_imp(&mut self) {
-        Mos6502Flags::C.clear(&mut self.status);
+        Mos6502Flags::C.clear(self);
     }
 
     fn jmp_sr_abs(&mut self) {
@@ -532,7 +534,7 @@ impl Mos6502 {
     }
 
     fn sec_imp(&mut self) {
-        Mos6502Flags::C.set(&mut self.status);
+        Mos6502Flags::C.set(self);
     }
 
     fn rol_absx(&mut self) {
@@ -596,7 +598,7 @@ impl Mos6502 {
     }
 
     fn cli_imp(&mut self) {
-        Mos6502Flags::I.clear(&mut self.status);
+        Mos6502Flags::I.clear(self);
     }
 
     fn eor_absy(&mut self) {
@@ -672,7 +674,7 @@ impl Mos6502 {
     }
 
     fn sei_imp(&mut self) {
-        Mos6502Flags::I.set(&mut self.status);
+        Mos6502Flags::I.set(self);
     }
 
     fn adc_absy(&mut self) {
@@ -835,7 +837,7 @@ impl Mos6502 {
     }
 
     fn clv_imp(&mut self) {
-        Mos6502Flags::V.clear(&mut self.status);
+        Mos6502Flags::V.clear(self);
     }
 
     fn lda_absy(&mut self) {
@@ -919,8 +921,7 @@ impl Mos6502 {
     }
 
     fn cld_imp(&mut self) {
-        Mos6502Flags::D.clear(&mut self.status);
-        self.cycle();
+        Mos6502Flags::D.clear(self);
     }
 
     fn cmp_absy(&mut self) {
@@ -996,7 +997,7 @@ impl Mos6502 {
     }
 
     fn sed_imp(&mut self) {
-        Mos6502Flags::D.set(&mut self.status);
+        Mos6502Flags::D.set(self);
         self.cycle();
     }
 
