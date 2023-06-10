@@ -34,6 +34,7 @@ pub struct Mos6502 {
     stackptr: Word,
     cycles: u32,
     pc: Word,
+    mem: Memory,
 }
 
 impl std::fmt::Display for Mos6502 {
@@ -48,31 +49,33 @@ const PROGRAM_COUNTER_BEGIN: Word = 0xFFFC;
 
 #[allow(dead_code)]
 impl Mos6502 {
-    pub fn new(cycles: Option<u32>) -> Self {
+    pub fn new(cycles: Option<u32>, mem: Memory) -> Self {
         let c = match cycles { Some(k) => k, _ => 0 };
         Self {
             acc: 0x00, x: 0x00, y: 0x00,
             status: 0x00, cycles: c,
             stackptr: STACKPTR_BEGIN,
             pc: PROGRAM_COUNTER_BEGIN,
+            mem
         }
     }
 
-    pub fn reset(&mut self, cycles: Option<u32>, mem: &mut Memory) {
+    pub fn reset(&mut self, cycles: Option<u32>) {
         (self.acc, self.x, self.y, self.status) = (0x00, 0x00, 0x00, 0x00);
         self.cycles = match cycles { Some(c) => c, _ => 0 };
         self.stackptr = STACKPTR_BEGIN;
         self.pc = PROGRAM_COUNTER_BEGIN;
-        mem.clear();
+        self.mem.clear();
     }
 
-    pub fn exe(&mut self, mem: &mut Memory) {
+    pub fn exe(&mut self) {
         while self.cycles > 0 {
-            let instr: Byte = self.fetch_byte(mem);
+            let instr: Byte = self.fetch_byte();
             match instr {
-                instructions::LDA_IMM => self.lda_imm(mem, instructions::LDA_IMM_COST),
-                instructions::LDA_ZP => self.lda_zp(mem, instructions::LDA_ZP_CCOST),
-                instructions::LDA_ZPX => self.lda_zpx(mem, instructions::LDA_ZPX_CCOST),
+                instructions::LDA_IMM => self.lda_imm(instructions::LDA_IMM_COST),
+                instructions::LDA_ABS => self.lda_abs(instructions::LDA_ABS_CCOST),
+                instructions::LDA_ZP => self.lda_zp(instructions::LDA_ZP_CCOST),
+                instructions::LDA_ZPX => self.lda_zpx(instructions::LDA_ZPX_CCOST),
                 instructions::CLC_IMP => self.clc_imp(instructions::CLC_IMP_CCOST),
                 instructions::CLD_IMP => self.cld_imp(instructions::CLD_IMP_CCOST),
                 instructions::CLI_IMP => self.cli_imp(instructions::CLI_IMP_CCOST),
@@ -97,30 +100,30 @@ impl Mos6502 {
         self.cycles -= c;
     }
 
-    fn read_byte(&mut self, addr: Byte, mem: &Memory) -> Byte {
+    fn read_byte(&mut self, addr: Byte) -> Byte {
         // NOTE: This function is needed to retrieve a byte
         // and not increment the program counter.
         // NOTE: it is not needed to use up a cycle here,
         // as the function that simulates the instruction
         // will cover it.
-        mem.get_byte(addr as usize)
+        self.mem.get_byte(addr as usize)
     }
 
-    fn fetch_byte(&mut self, mem: &Memory) -> Byte {
+    fn fetch_byte(&mut self) -> Byte {
         // NOTE: it is not needed to use up a cycle here,
         // as the function that simulates the instruction
         // will cover it.
-        let b: Byte = mem.get_byte(self.pc as usize);
+        let b: Byte = self.mem.get_byte(self.pc as usize);
         self.increment_program_counter(1);
         b
     }
 
-    fn fetch_word(&mut self, mem: &mut Memory) -> Word {
+    fn fetch_word(&mut self) -> Word {
         // NOTE: it is not needed to use up a cycle here,
         // as the function that simulates the instruction
         // will cover it.
-        let w1 = u16::from(mem.get_byte(self.pc as usize));
-        let w2 = u16::from(mem.get_byte((self.pc + 1) as usize));
+        let w1 = u16::from(self.mem.get_byte(self.pc as usize));
+        let w2 = u16::from(self.mem.get_byte((self.pc + 1) as usize));
         self.increment_program_counter(2);
         (w1 << 8) | w2
     }
@@ -136,7 +139,7 @@ impl Mos6502 {
         } else {
             Mos6502Flags::Z.clear(&mut self.status);
         }
-        if self.acc & 0b1000_0000 == 0 {
+        if self.acc & (1u8 << 7) == 0 {
             Mos6502Flags::N.clear(&mut self.status);
         } else {
             Mos6502Flags::N.set(&mut self.status);
@@ -145,22 +148,28 @@ impl Mos6502 {
 
     ////////// CPU FUNCTIONS //////////
 
-    fn lda_imm(&mut self, mem: &Memory, cycle_cost: u32) {
-        self.acc = self.fetch_byte(mem);
+    fn lda_imm(&mut self, cycle_cost: u32) {
+        self.acc = self.fetch_byte();
         self.lda_set_status();
         self.use_cycles(cycle_cost);
     }
 
-    fn lda_zp(&mut self, mem: &Memory, cycle_cost: u32) {
-        let zpaddr = self.fetch_byte(mem);
-        self.acc = self.read_byte(zpaddr, mem);
+    fn lda_abs(&mut self, cycle_cost: u32) {
+        todo!()
+    }
+
+    fn lda_zp(&mut self, cycle_cost: u32) {
+        // TODO: address overflow.
+        let zpaddr: Byte = self.fetch_byte();
+        self.acc = self.read_byte(zpaddr);
         self.lda_set_status();
         self.use_cycles(cycle_cost);
     }
 
-    fn lda_zpx(&mut self, mem: &Memory, cycle_cost: u32) {
-        let zpaddr = self.fetch_byte(mem) + self.x;
-        self.acc = self.read_byte(zpaddr, mem);
+    fn lda_zpx(&mut self, cycle_cost: u32) {
+        // TODO: address overflow.
+        let zpaddr: Byte = self.fetch_byte() + self.x;
+        self.acc = self.read_byte(zpaddr);
         self.lda_set_status();
         self.use_cycles(cycle_cost);
     }
