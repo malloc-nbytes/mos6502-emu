@@ -21,7 +21,7 @@ impl Mos6502Flags {
         *status |= 1u8 << (self as Byte);
     }
 
-    pub fn unset(self, status: &mut Byte) {
+    pub fn clear(self, status: &mut Byte) {
         *status &= !(1u8 << (self as Byte));
     }
 }
@@ -38,7 +38,7 @@ pub struct Mos6502 {
 
 impl std::fmt::Display for Mos6502 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "acc: {}\nx: {}\ny: {}\nstatus: {}\nstackptr: {}\npc: {}\ncycles: {}",
+        write!(f, "acc: {:x}\nx: {:x}\ny: {:x}\nstatus: {:x}\nstackptr: {:x}\npc: {:x}\ncycles: {:x}",
                self.acc, self.x, self.y, self.status, self.stackptr, self.pc, self.cycles)
     }
 }
@@ -58,10 +58,19 @@ impl Mos6502 {
         }
     }
 
+    pub fn reset(&mut self, cycles: Option<u32>, mem: &mut Memory) {
+        (self.acc, self.x, self.y, self.status) = (0x00, 0x00, 0x00, 0x00);
+        self.cycles = match cycles { Some(c) => c, _ => 0 };
+        self.stackptr = STACKPTR_BEGIN;
+        self.pc = PROGRAM_COUNTER_BEGIN;
+        mem.clear();
+    }
+
     pub fn exe(&mut self, mem: &mut Memory) {
         while self.cycles > 0 {
             let instr: Byte = self.fetch_byte(mem);
             match instr {
+                instructions::LDA_IMM => self.load_accumulator_with_memory_immediate(mem, instructions::LDA_IMM_COST),
                 instructions::CLC_IMP => self.clear_carry_flag(instructions::CLC_IMP_CCOST),
                 instructions::CLD_IMP => self.clear_decimal_mode(instructions::CLD_IMP_CCOST),
                 instructions::CLI_IMP => self.clear_interrupt_disable(instructions::CLI_IMP_CCOST),
@@ -70,7 +79,7 @@ impl Mos6502 {
                 instructions::SED_IMP => self.set_decimal_mode(instructions::SED_IMP_CCOST),
                 instructions::SEI_IMP => self.set_interrupt_disable(instructions::SEI_IMP_CCOST),
                 instructions::NOP_IMP => self.nop(instructions::NOP_IMP_CCOST),
-                _ => panic!("Unhandled instruction {instr}"),
+                _ => println!("Unhandled instruction {instr}"),
             }
         }
     }
@@ -89,7 +98,7 @@ impl Mos6502 {
     fn fetch_byte(&mut self, mem: &Memory) -> Byte {
         let b: Byte = mem.get_byte(self.pc as usize);
         self.increment_program_counter(1);
-        self.use_cycles(1);
+        // self.use_cycles(1);
         b
     }
 
@@ -107,35 +116,40 @@ impl Mos6502 {
         if self.acc == 0 {
             Mos6502Flags::Z.set(&mut self.status);
         } else {
-            Mos6502Flags::Z.unset(&mut self.status);
+            Mos6502Flags::Z.clear(&mut self.status);
         }
         if self.acc & 0b1000_0000 == 0 {
-            Mos6502Flags::N.unset(&mut self.status);
+            Mos6502Flags::N.clear(&mut self.status);
         } else {
             Mos6502Flags::N.set(&mut self.status);
         }
-        todo!("update cycles");
     }
 
     ////////// CPU FUNCTIONS //////////
 
+    fn load_accumulator_with_memory_immediate(&mut self, mem: &Memory, cycle_cost: u32) {
+        self.acc = self.fetch_byte(mem);
+        self.use_cycles(cycle_cost);
+        self.lda_set_status();
+    }
+
     fn clear_carry_flag(&mut self, cycle_cost: u32) {
-        Mos6502Flags::C.unset(&mut self.status);
+        Mos6502Flags::C.clear(&mut self.status);
         self.use_cycles(cycle_cost);
     }
 
     fn clear_decimal_mode(&mut self, cycle_cost: u32) {
-        Mos6502Flags::D.unset(&mut self.status);
+        Mos6502Flags::D.clear(&mut self.status);
         self.use_cycles(cycle_cost);
     }
 
     fn clear_interrupt_disable(&mut self, cycle_cost: u32) {
-        Mos6502Flags::I.unset(&mut self.status);
+        Mos6502Flags::I.clear(&mut self.status);
         self.use_cycles(cycle_cost);
     }
 
     fn clear_overflow_flag(&mut self, cycle_cost: u32) {
-        Mos6502Flags::V.unset(&mut self.status);
+        Mos6502Flags::V.clear(&mut self.status);
         self.use_cycles(cycle_cost);
     }
 

@@ -12,6 +12,10 @@ impl Memory {
         Self { data: [0; MEM_MAX] }
     }
 
+    pub fn clear(&mut self) {
+        (0..MEM_MAX).for_each(|i| self.data[i] = 0);
+    }
+
     pub fn get_byte(&self, idx: usize) -> Byte {
         self.data[idx]
     }
