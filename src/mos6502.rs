@@ -1,6 +1,8 @@
 #![allow(dead_code)]
 
 use crate::memory::Memory;
+
+#[allow(unused_imports)]
 use crate::instructions;
 
 type Byte = u8;
@@ -321,6 +323,10 @@ impl Mos6502 {
         }
     }
 
+    fn cycle(&mut self) {
+        self.cycles -= 1;
+    }
+
     pub fn reset(&mut self, cycles: Option<u32>) {
         (self.acc, self.x, self.y, self.status) = (0x00, 0x00, 0x00, 0x00);
         self.cycles = match cycles { Some(c) => c, _ => 0 };
@@ -342,49 +348,38 @@ impl Mos6502 {
 
     ////////// HELPER FUNCTIONS //////////
 
-    fn increment_program_counter(&mut self, increment: Word) {
-        self.pc += increment;
-    }
-
-    fn use_cycles(&mut self, c: u32) {
-        assert!(self.cycles > 0);
-        self.cycles -= c;
+    fn decrement_program_counter(&mut self, increment: Word) {
+        self.pc -= increment;
     }
 
     fn read_byte(&mut self, addr: Byte) -> Byte {
         // NOTE: This function is needed to retrieve a byte
         // and not increment the program counter.
-        // NOTE: it is not needed to use up a cycle here,
-        // as the function that simulates the instruction
-        // will cover it.
+        self.cycle();
         self.mem.get_byte(addr as usize)
     }
 
     fn fetch_byte(&mut self) -> Byte {
-        // NOTE: it is not needed to use up a cycle here,
-        // as the function that simulates the instruction
-        // will cover it.
         let b: Byte = self.mem.get_byte(self.pc as usize);
-        self.increment_program_counter(1);
+        self.decrement_program_counter(1);
+        self.cycle();
         b
     }
 
     fn fetch_word(&mut self) -> Word {
-        // NOTE: it is not needed to use up a cycle here,
-        // as the function that simulates the instruction
-        // will cover it.
         let w1 = u16::from(self.mem.get_byte(self.pc as usize));
+        self.cycle();
+
         let w2 = u16::from(self.mem.get_byte((self.pc + 1) as usize));
-        self.increment_program_counter(2);
+        self.cycle();
+
+        self.decrement_program_counter(2);
         (w1 << 8) | w2
     }
 
     ////////// SET STATUS FUNCTIONS //////////
 
     fn lda_set_status(&mut self) {
-        // NOTE: it is not needed to use up a cycle here,
-        // as the function that simulates the instruction
-        // will cover it.
         if self.acc == 0 {
             Mos6502Flags::Z.set(&mut self.status);
         } else {
@@ -395,6 +390,7 @@ impl Mos6502 {
         } else {
             Mos6502Flags::N.set(&mut self.status);
         }
+        self.cycle();
     }
 
     ////////// CPU INSTRUCTION FUNCTIONS //////////
@@ -497,7 +493,6 @@ impl Mos6502 {
 
     fn clc_imp(&mut self) {
         Mos6502Flags::C.clear(&mut self.status);
-        self.use_cycles(instructions::CLC_IMP_CCOST);
     }
 
     fn jmp_sr_abs(&mut self) {
@@ -538,7 +533,6 @@ impl Mos6502 {
 
     fn sec_imp(&mut self) {
         Mos6502Flags::C.set(&mut self.status);
-        self.use_cycles(instructions::SEC_IMP_CCOST);
     }
 
     fn rol_absx(&mut self) {
@@ -603,7 +597,6 @@ impl Mos6502 {
 
     fn cli_imp(&mut self) {
         Mos6502Flags::I.clear(&mut self.status);
-        self.use_cycles(instructions::CLI_IMP_CCOST);
     }
 
     fn eor_absy(&mut self) {
@@ -680,7 +673,6 @@ impl Mos6502 {
 
     fn sei_imp(&mut self) {
         Mos6502Flags::I.set(&mut self.status);
-        self.use_cycles(instructions::SEI_IMP_CCOST);
     }
 
     fn adc_absy(&mut self) {
@@ -788,7 +780,6 @@ impl Mos6502 {
         let zpaddr: Byte = self.fetch_byte();
         self.acc = self.read_byte(zpaddr);
         self.lda_set_status();
-        self.use_cycles(instructions::LDA_ZP_CCOST);
     }
 
     fn ldx_zp(&mut self) {
@@ -802,7 +793,6 @@ impl Mos6502 {
     fn lda_imm(&mut self) {
         self.acc = self.fetch_byte();
         self.lda_set_status();
-        self.use_cycles(instructions::LDA_IMM_COST);
     }
 
     fn tax_imp(&mut self) {
@@ -838,7 +828,6 @@ impl Mos6502 {
         let zpaddr: Byte = self.fetch_byte() + self.x;
         self.acc = self.read_byte(zpaddr);
         self.lda_set_status();
-        self.use_cycles(instructions::LDA_ZPX_CCOST);
     }
 
     fn ldx_zpy(&mut self) {
@@ -847,7 +836,6 @@ impl Mos6502 {
 
     fn clv_imp(&mut self) {
         Mos6502Flags::V.clear(&mut self.status);
-        self.use_cycles(instructions::CLV_IMP_CCOST);
     }
 
     fn lda_absy(&mut self) {
@@ -932,7 +920,7 @@ impl Mos6502 {
 
     fn cld_imp(&mut self) {
         Mos6502Flags::D.clear(&mut self.status);
-        self.use_cycles(instructions::CLD_IMP_CCOST);
+        self.cycle();
     }
 
     fn cmp_absy(&mut self) {
@@ -976,7 +964,7 @@ impl Mos6502 {
     }
 
     fn nop_imp(&mut self) {
-        self.use_cycles(instructions::NOP_IMP_CCOST);
+        self.cycle();
     }
 
     fn cpx_abs(&mut self) {
@@ -1009,7 +997,7 @@ impl Mos6502 {
 
     fn sed_imp(&mut self) {
         Mos6502Flags::D.set(&mut self.status);
-        self.use_cycles(instructions::SED_IMP_CCOST);
+        self.cycle();
     }
 
     fn sbc_absy(&mut self) {
