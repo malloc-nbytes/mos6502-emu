@@ -1,37 +1,41 @@
+#![allow(dead_code)]
+
 use crate::memory::Memory;
 use crate::instructions;
 
 type Byte = u8;
 type Word = u16;
 
-#[allow(dead_code)]
 enum Mos6502Flags {
-    C = 0, // Carry
-    Z = 1, // Zero
-    I = 2, // Disable interrupts
-    D = 3, // Decimal mode (unused)
-    B = 4, // Break
-    U = 5, // Unused
-    V = 6, // Overflow
-    N = 7, // Negative
+    C = 1 << 0, // Carry
+    Z = 1 << 1, // Zero
+    I = 1 << 2, // Disable interrupts
+    D = 1 << 3, // Decimal mode (unused)
+    B = 1 << 4, // Break
+    U = 1 << 5, // Unused
+    V = 1 << 6, // Overflow
+    N = 1 << 7, // Negative
 }
 
 impl Mos6502Flags {
     pub fn set(self, status: &mut Byte) {
-        *status |= 1u8 << (self as Byte);
+        *status |= self as Byte
     }
 
     pub fn clear(self, status: &mut Byte) {
-        *status &= !(1u8 << (self as Byte));
+        *status &= !(self as Byte)
     }
 }
+
+const STACKPTR_BEGIN: Byte = 0xFF;
+const PROGRAM_COUNTER_BEGIN: Word = 0xFFFC;
 
 pub struct Mos6502 {
     acc: Byte,
     x: Byte,
     y: Byte,
     status: Byte,
-    stackptr: Word,
+    stackptr: Byte,
     cycles: u32,
     pc: Word,
     mem: Memory,
@@ -44,10 +48,49 @@ impl std::fmt::Display for Mos6502 {
     }
 }
 
-const STACKPTR_BEGIN: Word = 0x0100;
-const PROGRAM_COUNTER_BEGIN: Word = 0xFFFC;
+const LOOKUP_TBL_SIZE: usize = 256;
 
-#[allow(dead_code)]
+const LOOKUP: [Option<fn(&mut Mos6502)>; LOOKUP_TBL_SIZE] = [
+    Some(Mos6502::brk_imp),
+    Some(Mos6502::ora_zpx_ind),
+    None,
+    None,
+    None,
+    Some(Mos6502::ora_zp),
+    Some(Mos6502::asl_zp),
+    None,
+    Some(Mos6502::php_imp),
+    Some(Mos6502::ora_imm),
+    Some(Mos6502::asl_acc),
+    None,
+    None,
+    Some(Mos6502::ora_abs),
+    Some(Mos6502::asl_abs),
+    None,
+    Some(Mos6502::bpl_rel),
+    Some(Mos6502::ora_zpy_ind),
+    None,
+    None,
+    None,
+    Some(Mos6502::ora_zpx),
+    Some(Mos6502::asl_zpx),
+    None,
+    Some(Mos6502::clc_imp),
+    Some(Mos6502::ora_absy),
+    None,
+    None,
+    None,
+    Some(Mos6502::ora_absx),
+    Some(Mos6502::asl_absx),
+    None,
+    Some(Mos6502::jmp_sr_abs),
+    Some(Mos6502::and_zpx_ind),
+    None,
+    None,
+    Some(Mos6502::bit_zp),
+    Some(Mos6502::and_zp),
+];
+
 impl Mos6502 {
     pub fn new(cycles: Option<u32>, mem: Memory) -> Self {
         let c = match cycles { Some(k) => k, _ => 0 };
@@ -56,7 +99,7 @@ impl Mos6502 {
             status: 0x00, cycles: c,
             stackptr: STACKPTR_BEGIN,
             pc: PROGRAM_COUNTER_BEGIN,
-            mem
+            mem,
         }
     }
 
@@ -70,22 +113,8 @@ impl Mos6502 {
 
     pub fn exe(&mut self) {
         while self.cycles > 0 {
-            let instr: Byte = self.fetch_byte();
-            match instr {
-                instructions::LDA_IMM => self.lda_imm(instructions::LDA_IMM_COST),
-                instructions::LDA_ABS => self.lda_abs(instructions::LDA_ABS_CCOST),
-                instructions::LDA_ZP => self.lda_zp(instructions::LDA_ZP_CCOST),
-                instructions::LDA_ZPX => self.lda_zpx(instructions::LDA_ZPX_CCOST),
-                instructions::CLC_IMP => self.clc_imp(instructions::CLC_IMP_CCOST),
-                instructions::CLD_IMP => self.cld_imp(instructions::CLD_IMP_CCOST),
-                instructions::CLI_IMP => self.cli_imp(instructions::CLI_IMP_CCOST),
-                instructions::CLV_IMP => self.clv_imp(instructions::CLV_IMP_CCOST),
-                instructions::SEC_IMP => self.sec_imp(instructions::SEC_IMP_CCOST),
-                instructions::SED_IMP => self.sed_imp(instructions::SED_IMP_CCOST),
-                instructions::SEI_IMP => self.sei_imp(instructions::SEI_IMP_CCOST),
-                instructions::NOP_IMP => self.nop_imp(instructions::NOP_IMP_CCOST),
-                _ => println!("Unhandled instruction {instr}"),
-            }
+            let _instr: Byte = self.fetch_byte();
+            todo!()
         }
     }
 
@@ -148,68 +177,148 @@ impl Mos6502 {
 
     ////////// CPU FUNCTIONS //////////
 
-    fn lda_imm(&mut self, cycle_cost: u32) {
-        self.acc = self.fetch_byte();
-        self.lda_set_status();
-        self.use_cycles(cycle_cost);
-    }
-
-    fn lda_abs(&mut self, cycle_cost: u32) {
+    fn brk_imp(&mut self) {
         todo!()
     }
 
-    fn lda_zp(&mut self, cycle_cost: u32) {
+    fn ora_zpx_ind(&mut self) {
+        todo!()
+    }
+
+    fn ora_zp(&mut self) {
+        todo!()
+    }
+
+    fn asl_zp(&mut self) {
+        todo!()
+    }
+
+    fn php_imp(&mut self) {
+        todo!()
+    }
+
+    fn ora_imm(&mut self) {
+        todo!()
+    }
+
+    fn asl_acc(&mut self) {
+        todo!()
+    }
+
+    fn ora_abs(&mut self) {
+        todo!()
+    }
+
+    fn asl_abs(&mut self) {
+        todo!()
+    }
+
+    fn bpl_rel(&mut self) {
+        todo!()
+    }
+
+    fn ora_zpy_ind(&mut self) {
+        todo!()
+    }
+
+    fn ora_zpx(&mut self) {
+        todo!()
+    }
+
+    fn asl_zpx(&mut self) {
+        todo!()
+    }
+
+    fn clc_imp(&mut self) {
+        Mos6502Flags::C.clear(&mut self.status);
+        self.use_cycles(instructions::CLC_IMP_CCOST);
+    }
+
+    fn ora_absy(&mut self) {
+        todo!()
+    }
+
+    fn ora_absx(&mut self) {
+        todo!()
+    }
+
+    fn asl_absx(&mut self) {
+        todo!()
+    }
+
+    fn jmp_sr_abs(&mut self) {
+        todo!()
+    }
+
+    fn and_zpx_ind(&mut self) {
+        todo!()
+    }
+
+    fn bit_zp(&mut self) {
+        todo!()
+    }
+
+    fn and_zp(&mut self) {
+        todo!()
+    }
+
+    fn lda_imm(&mut self) {
+        self.acc = self.fetch_byte();
+        self.lda_set_status();
+        self.use_cycles(instructions::LDA_IMM_COST);
+    }
+
+    fn lda_abs(&mut self) {
+        todo!()
+    }
+
+    fn lda_zp(&mut self) {
         // TODO: address overflow.
         let zpaddr: Byte = self.fetch_byte();
         self.acc = self.read_byte(zpaddr);
         self.lda_set_status();
-        self.use_cycles(cycle_cost);
+        self.use_cycles(instructions::LDA_ZP_CCOST);
     }
 
-    fn lda_zpx(&mut self, cycle_cost: u32) {
+    fn lda_zpx(&mut self) {
         // TODO: address overflow.
         let zpaddr: Byte = self.fetch_byte() + self.x;
         self.acc = self.read_byte(zpaddr);
         self.lda_set_status();
-        self.use_cycles(cycle_cost);
+        self.use_cycles(instructions::LDA_ZPX_CCOST);
     }
 
-    fn clc_imp(&mut self, cycle_cost: u32) {
-        Mos6502Flags::C.clear(&mut self.status);
-        self.use_cycles(cycle_cost);
-    }
-
-    fn cld_imp(&mut self, cycle_cost: u32) {
+    fn cld_imp(&mut self) {
         Mos6502Flags::D.clear(&mut self.status);
-        self.use_cycles(cycle_cost);
+        self.use_cycles(instructions::CLD_IMP_CCOST);
     }
 
-    fn cli_imp(&mut self, cycle_cost: u32) {
+    fn cli_imp(&mut self) {
         Mos6502Flags::I.clear(&mut self.status);
-        self.use_cycles(cycle_cost);
+        self.use_cycles(instructions::CLI_IMP_CCOST);
     }
 
-    fn clv_imp(&mut self, cycle_cost: u32) {
+    fn clv_imp(&mut self) {
         Mos6502Flags::V.clear(&mut self.status);
-        self.use_cycles(cycle_cost);
+        self.use_cycles(instructions::CLV_IMP_CCOST);
     }
 
-    fn sec_imp(&mut self, cycle_cost: u32) {
+    fn sec_imp(&mut self) {
         Mos6502Flags::C.set(&mut self.status);
-        self.use_cycles(cycle_cost);
+        self.use_cycles(instructions::SEC_IMP_CCOST);
     }
 
-    fn sed_imp(&mut self, cycle_cost: u32) {
+    fn sed_imp(&mut self) {
         Mos6502Flags::D.set(&mut self.status);
-        self.use_cycles(cycle_cost);
+        self.use_cycles(instructions::SED_IMP_CCOST);
     }
 
-    fn sei_imp(&mut self, cycle_cost: u32) {
+    fn sei_imp(&mut self) {
         Mos6502Flags::I.set(&mut self.status);
-        self.use_cycles(cycle_cost);
+        self.use_cycles(instructions::SEI_IMP_CCOST);
     }
 
-    fn nop_imp(&mut self, cycle_cost: u32) {
-        self.use_cycles(cycle_cost);
+    fn nop_imp(&mut self) {
+        self.use_cycles(instructions::NOP_IMP_CCOST);
     }
 }

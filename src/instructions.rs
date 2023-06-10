@@ -2,6 +2,7 @@
 
 // Reference(s):
 //  https://www.pagetable.com/c64ref/6502/?tab=2
+//  https://www.masswerk.at/6502/6502_instruction_set.html
 
 // (ﾉಥДಥ)ﾉ ︵┻━┻･/
 
@@ -1097,8 +1098,8 @@ pub const JMP_ABS_IND_CCOST: u32 = 5;
 // Opcode:          $20
 // Bytes:           3
 // Cycles:          6
-pub const JMP_SR: Byte = 0x20;
-pub const JMP_SR_CCOST: u32 = 6;
+pub const JMP_SR_ABS: Byte = 0x20;
+pub const JMP_SR_ABS_CCOST: u32 = 6;
 
 ////////// Return From Interrupt (RTI) //////////
 //
@@ -1183,6 +1184,7 @@ pub const BNE_REL_CCOST: u32 = 2;
 // Opcode:          $10
 // Bytes:           2
 // Cycles:          ~*2
+pub const BPL_REL: Byte = 0x10;
 pub const BPL_REL_CCOST: u32 = 2;
 
 ////////// Branch on Overflow Clear (BVC) //////////
