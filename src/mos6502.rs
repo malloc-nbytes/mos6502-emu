@@ -70,15 +70,16 @@ impl Mos6502 {
         while self.cycles > 0 {
             let instr: Byte = self.fetch_byte(mem);
             match instr {
-                instructions::LDA_IMM => self.load_accumulator_with_memory_immediate(mem, instructions::LDA_IMM_COST),
-                instructions::CLC_IMP => self.clear_carry_flag(instructions::CLC_IMP_CCOST),
-                instructions::CLD_IMP => self.clear_decimal_mode(instructions::CLD_IMP_CCOST),
-                instructions::CLI_IMP => self.clear_interrupt_disable(instructions::CLI_IMP_CCOST),
-                instructions::CLV_IMP => self.clear_overflow_flag(instructions::CLV_IMP_CCOST),
-                instructions::SEC_IMP => self.set_carry_flag(instructions::SEC_IMP_CCOST),
-                instructions::SED_IMP => self.set_decimal_mode(instructions::SED_IMP_CCOST),
-                instructions::SEI_IMP => self.set_interrupt_disable(instructions::SEI_IMP_CCOST),
-                instructions::NOP_IMP => self.nop(instructions::NOP_IMP_CCOST),
+                instructions::LDA_IMM => self.lda_imm(mem, instructions::LDA_IMM_COST),
+                instructions::LDA_ZP => self.lda_zp(mem, instructions::LDA_ZP_CCOST),
+                instructions::CLC_IMP => self.clc_imp(instructions::CLC_IMP_CCOST),
+                instructions::CLD_IMP => self.cld_imp(instructions::CLD_IMP_CCOST),
+                instructions::CLI_IMP => self.cli_imp(instructions::CLI_IMP_CCOST),
+                instructions::CLV_IMP => self.clv_imp(instructions::CLV_IMP_CCOST),
+                instructions::SEC_IMP => self.sec_imp(instructions::SEC_IMP_CCOST),
+                instructions::SED_IMP => self.sed_imp(instructions::SED_IMP_CCOST),
+                instructions::SEI_IMP => self.sei_imp(instructions::SEI_IMP_CCOST),
+                instructions::NOP_IMP => self.nop_imp(instructions::NOP_IMP_CCOST),
                 _ => println!("Unhandled instruction {instr}"),
             }
         }
@@ -95,24 +96,40 @@ impl Mos6502 {
         self.cycles -= c;
     }
 
+    fn read_byte(&mut self, addr: Byte, mem: &Memory) -> Byte {
+        // NOTE: This function is needed to retrieve a byte
+        // and not increment the program counter.
+        // NOTE: it is not needed to use up a cycle here,
+        // as the function that simulates the instruction
+        // will cover it.
+        mem.get_byte(addr as usize)
+    }
+
     fn fetch_byte(&mut self, mem: &Memory) -> Byte {
+        // NOTE: it is not needed to use up a cycle here,
+        // as the function that simulates the instruction
+        // will cover it.
         let b: Byte = mem.get_byte(self.pc as usize);
         self.increment_program_counter(1);
-        // self.use_cycles(1);
         b
     }
 
     fn fetch_word(&mut self, mem: &mut Memory) -> Word {
+        // NOTE: it is not needed to use up a cycle here,
+        // as the function that simulates the instruction
+        // will cover it.
         let w1 = u16::from(mem.get_byte(self.pc as usize));
         let w2 = u16::from(mem.get_byte((self.pc + 1) as usize));
         self.increment_program_counter(2);
-        self.use_cycles(2);
         (w1 << 8) | w2
     }
 
     ////////// SET STATUS FUNCTIONS //////////
 
     fn lda_set_status(&mut self) {
+        // NOTE: it is not needed to use up a cycle here,
+        // as the function that simulates the instruction
+        // will cover it.
         if self.acc == 0 {
             Mos6502Flags::Z.set(&mut self.status);
         } else {
@@ -127,48 +144,54 @@ impl Mos6502 {
 
     ////////// CPU FUNCTIONS //////////
 
-    fn load_accumulator_with_memory_immediate(&mut self, mem: &Memory, cycle_cost: u32) {
+    fn lda_imm(&mut self, mem: &Memory, cycle_cost: u32) {
         self.acc = self.fetch_byte(mem);
         self.use_cycles(cycle_cost);
         self.lda_set_status();
     }
 
-    fn clear_carry_flag(&mut self, cycle_cost: u32) {
+    fn lda_zp(&mut self, mem: &Memory, cycle_cost: u32) {
+        let zpaddr = self.fetch_byte(mem);
+        self.acc = self.read_byte(zpaddr, mem);
+        self.use_cycles(cycle_cost);
+    }
+
+    fn clc_imp(&mut self, cycle_cost: u32) {
         Mos6502Flags::C.clear(&mut self.status);
         self.use_cycles(cycle_cost);
     }
 
-    fn clear_decimal_mode(&mut self, cycle_cost: u32) {
+    fn cld_imp(&mut self, cycle_cost: u32) {
         Mos6502Flags::D.clear(&mut self.status);
         self.use_cycles(cycle_cost);
     }
 
-    fn clear_interrupt_disable(&mut self, cycle_cost: u32) {
+    fn cli_imp(&mut self, cycle_cost: u32) {
         Mos6502Flags::I.clear(&mut self.status);
         self.use_cycles(cycle_cost);
     }
 
-    fn clear_overflow_flag(&mut self, cycle_cost: u32) {
+    fn clv_imp(&mut self, cycle_cost: u32) {
         Mos6502Flags::V.clear(&mut self.status);
         self.use_cycles(cycle_cost);
     }
 
-    fn set_carry_flag(&mut self, cycle_cost: u32) {
+    fn sec_imp(&mut self, cycle_cost: u32) {
         Mos6502Flags::C.set(&mut self.status);
         self.use_cycles(cycle_cost);
     }
 
-    fn set_decimal_mode(&mut self, cycle_cost: u32) {
+    fn sed_imp(&mut self, cycle_cost: u32) {
         Mos6502Flags::D.set(&mut self.status);
         self.use_cycles(cycle_cost);
     }
 
-    fn set_interrupt_disable(&mut self, cycle_cost: u32) {
+    fn sei_imp(&mut self, cycle_cost: u32) {
         Mos6502Flags::I.set(&mut self.status);
         self.use_cycles(cycle_cost);
     }
 
-    fn nop(&mut self, cycle_cost: u32) {
+    fn nop_imp(&mut self, cycle_cost: u32) {
         self.use_cycles(cycle_cost);
     }
 }
