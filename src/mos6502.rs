@@ -48,7 +48,7 @@ impl std::fmt::Display for Mos6502 {
     }
 }
 
-const LOOKUP_TBL_SIZE: usize = 78;
+const LOOKUP_TBL_SIZE: usize = 121;
 
 const LOOKUP: [Option<fn(&mut Mos6502)>; LOOKUP_TBL_SIZE] = [
     Some(Mos6502::brk_imp),
@@ -129,6 +129,49 @@ const LOOKUP: [Option<fn(&mut Mos6502)>; LOOKUP_TBL_SIZE] = [
     None,
     Some(Mos6502::jmp_abs),
     Some(Mos6502::eor_abs),
+    Some(Mos6502::lsr_abs),
+    None,
+    Some(Mos6502::bvc_rel),
+    Some(Mos6502::eor_zpy_ind),
+    None,
+    None,
+    None,
+    Some(Mos6502::eor_zpx),
+    Some(Mos6502::lsr_zpx),
+    None,
+    Some(Mos6502::cli_imp),
+    Some(Mos6502::eor_absy),
+    None,
+    None,
+    None,
+    Some(Mos6502::eor_absx),
+    Some(Mos6502::lsr_absx),
+    None,
+    Some(Mos6502::rts_imp),
+    Some(Mos6502::adc_zpx_ind),
+    None,
+    None,
+    None,
+    Some(Mos6502::adc_zp),
+    Some(Mos6502::ror_zp),
+    None,
+    Some(Mos6502::pla_imp),
+    Some(Mos6502::adc_imm),
+    Some(Mos6502::ror_acc),
+    None,
+    Some(Mos6502::jmp_abs_ind),
+    Some(Mos6502::adc_abs),
+    Some(Mos6502::ror_abs),
+    None,
+    Some(Mos6502::bvs_rel),
+    Some(Mos6502::adc_zpy_ind),
+    None,
+    None,
+    None,
+    Some(Mos6502::adc_zpx),
+    Some(Mos6502::ror_zpx),
+    None,
+    Some(Mos6502::sei_imp),
 ];
 
 impl Mos6502 {
@@ -399,6 +442,108 @@ impl Mos6502 {
         todo!()
     }
 
+    fn lsr_abs(&mut self) {
+        todo!()
+    }
+
+    fn bvc_rel(&mut self) {
+        todo!()
+    }
+
+    fn eor_zpy_ind(&mut self) {
+        todo!()
+    }
+
+    fn eor_zpx(&mut self) {
+        todo!()
+    }
+
+    fn lsr_zpx(&mut self) {
+        todo!()
+    }
+
+    fn cli_imp(&mut self) {
+        Mos6502Flags::I.clear(&mut self.status);
+        self.use_cycles(instructions::CLI_IMP_CCOST);
+    }
+
+    fn eor_absy(&mut self) {
+        todo!()
+    }
+
+    fn eor_absx(&mut self) {
+        todo!()
+    }
+
+    fn lsr_absx(&mut self) {
+        todo!()
+    }
+
+    fn rts_imp(&mut self) {
+        todo!()
+    }
+
+    fn adc_zpx_ind(&mut self) {
+        todo!()
+    }
+
+    fn adc_zpx_in(&mut self) {
+        todo!()
+    }
+
+    fn adc_zp(&mut self) {
+        todo!()
+    }
+
+    fn ror_zp(&mut self) {
+        todo!()
+    }
+
+    fn pla_imp(&mut self) {
+        todo!()
+    }
+
+    fn adc_imm(&mut self) {
+        todo!()
+    }
+
+    fn ror_acc(&mut self) {
+        todo!()
+    }
+
+    fn jmp_abs_ind(&mut self) {
+        todo!()
+    }
+
+    fn adc_abs(&mut self) {
+        todo!()
+    }
+
+    fn ror_abs(&mut self) {
+        todo!()
+    }
+
+    fn bvs_rel(&mut self) {
+        todo!()
+    }
+
+    fn adc_zpy_ind(&mut self) {
+        todo!()
+    }
+
+    fn adc_zpx(&mut self) {
+        todo!()
+    }
+
+    fn ror_zpx(&mut self) {
+        todo!()
+    }
+
+    fn sei_imp(&mut self) {
+        Mos6502Flags::I.set(&mut self.status);
+        self.use_cycles(instructions::SEI_IMP_CCOST);
+    }
+
     fn lda_imm(&mut self) {
         self.acc = self.fetch_byte();
         self.lda_set_status();
@@ -430,11 +575,6 @@ impl Mos6502 {
         self.use_cycles(instructions::CLD_IMP_CCOST);
     }
 
-    fn cli_imp(&mut self) {
-        Mos6502Flags::I.clear(&mut self.status);
-        self.use_cycles(instructions::CLI_IMP_CCOST);
-    }
-
     fn clv_imp(&mut self) {
         Mos6502Flags::V.clear(&mut self.status);
         self.use_cycles(instructions::CLV_IMP_CCOST);
@@ -443,11 +583,6 @@ impl Mos6502 {
     fn sed_imp(&mut self) {
         Mos6502Flags::D.set(&mut self.status);
         self.use_cycles(instructions::SED_IMP_CCOST);
-    }
-
-    fn sei_imp(&mut self) {
-        Mos6502Flags::I.set(&mut self.status);
-        self.use_cycles(instructions::SEI_IMP_CCOST);
     }
 
     fn nop_imp(&mut self) {
