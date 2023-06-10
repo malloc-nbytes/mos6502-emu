@@ -26,42 +26,49 @@ pub const LDA_IMM_COST: u32 = 2;
 // Bytes:           3
 // Cycles:          4
 pub const LDA_ABS: Byte = 0xAD;
+pub const LDA_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $BD
 // Bytes:           3
 // Cycles:          ~4
 pub const LDA_ABSX: Byte = 0xBD;
+pub const LDA_ABSX_CCOST: u32 = 4;
 
 // Addressing Mode: Y-Indexed Absolute
 // Opcode:          $B9
 // Bytes:           3
 // Cycles:          ~4
 pub const LDA_ABSY: Byte = 0xB9;
+pub const LDA_ABSY_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $A5
 // Bytes:           2
 // Cycles:          3
 pub const LDA_ZP: Byte = 0xA5;
+pub const LDA_ZP_CCOST: u32 = 3;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $B5
 // Bytes:           2
 // Cycles:          4
 pub const LDA_ZPX: Byte = 0xB5;
+pub const LDA_ZPX_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Zero Page Indirect
 // Opcode:          $A1
 // Bytes:           2
 // Cycles:          6
 pub const LDA_ZPX_IND: Byte = 0xA1;
+pub const LDA_ZPX_IND_CCOST: u32 = 6;
 
 // Addressing Mode: Zero Page Indirect Y-Indexed
 // Opcode:          $B1
 // Bytes:           2
 // Cycles:          ~5
 pub const LDA_ZPY_IND: Byte = 0xB1;
+pub const LDA_ZPY_IND_CCOST: u32 = 5;
 
 ////////// Load Index Register X from Memory (LDX) //////////
 //
@@ -72,30 +79,35 @@ pub const LDA_ZPY_IND: Byte = 0xB1;
 // Bytes:           2
 // Cycles:          2
 pub const LDX_IMM: Byte = 0xA2;
+pub const LDX_IMM_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $AE
 // Bytes:           3
 // Cycles:          4
 pub const LDX_ABS: Byte = 0xAE;
+pub const LDX_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: Y-Indexed Absolute
 // Opcode:          $BE
 // Bytes:           3
 // Cycles:          ~4
 pub const LDX_ABSY: Byte = 0xBE;
+pub const LDX_ABSY_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $A6
 // Bytes:           2
 // Cycles:          3
 pub const LDX_ZP: Byte = 0xA6;
+pub const LDX_ZP_CCOST: u32 = 3;
 
 // Addressing Mode: Y-Indexed Zero Page
 // Opcode:          $B6
 // Bytes:           2
 // Cycles:          4
 pub const LDX_ZPY: Byte = 0xB6;
+pub const LDX_ZPY_CCOST: u32 = 4;
 
 ////////// Load Index Register Y from Memory (LDY) //////////
 //
@@ -106,30 +118,35 @@ pub const LDX_ZPY: Byte = 0xB6;
 // Bytes:           2
 // Cycles:          2
 pub const LDY_IMM: Byte = 0xA0;
+pub const LDY_IMM_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $AC
 // Bytes:           3
 // Cycles:          4
 pub const LDY_ABS: Byte = 0xAC;
+pub const LDY_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $BC
 // Bytes:           3
 // Cycles:          ~4
 pub const LDY_ABSX: Byte = 0xBC;
+pub const LDY_ABSX_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $A4
 // Bytes:           2
 // Cycles:          3
 pub const LDY_ZP: Byte = 0xA4;
+pub const LDY_ZP_CCOST: u32 = 3;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $B4
 // Bytes:           2
 // Cycles:          4
 pub const LDY_ZPX: Byte = 0xB4;
+pub const LDY_ZPX_CCOST: u32 = 4;
 
 ////////// Store Accumulator in Memory (STA) //////////
 //
@@ -140,42 +157,49 @@ pub const LDY_ZPX: Byte = 0xB4;
 // Bytes:           3
 // Cycles:          4
 pub const STA_ABS: Byte = 0x8D;
+pub const STA_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $9D
 // Bytes:           3
 // Cycles:          5
 pub const STA_ABSX: Byte = 0x9D;
+pub const STA_ABSX_CCOST: u32 = 5;
 
 // Addressing Mode: Y-Indexed Absolute
 // Opcode:          $99
 // Bytes:           3
 // Cycles:          5
 pub const STA_ABSY: Byte = 0x99;
+pub const STA_ABSY_CCOST: u32 = 5;
 
 // Addressing Mode: Zero Page
 // Opcode:          $85
 // Bytes:           2
 // Cycles:          3
 pub const STA_ZP: Byte = 0x85;
+pub const STA_ZP_CCOST: u32 = 3;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $95
 // Bytes:           2
 // Cycles:          4
 pub const STA_ZPX: Byte = 0x95;
+pub const STA_ZPX_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Zero Page Indirect
 // Opcode:          $81
 // Bytes:           2
 // Cycles:          6
 pub const STA_ZPX_IND: Byte = 0x81;
+pub const STA_ZPX_IND_CCOST: u32 = 6;
 
 // Addressing Mode: Zero Page Indirect Y-Indexed
 // Opcode:          $91
 // Bytes:           2
 // Cycles:          6
 pub const STA_ZPY_IND: Byte = 0x91;
+pub const STA_ZPY_IND_CCOST: u32 = 6;
 
 ////////// Store Index Register X in Memory (STX) //////////
 //
@@ -186,18 +210,21 @@ pub const STA_ZPY_IND: Byte = 0x91;
 // Bytes:           3
 // Cycles:          4
 pub const STX_ABS: Byte = 0x91;
+pub const STX_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $86
 // Bytes:           2
 // Cycles:          3
 pub const STX_ZP: Byte = 0x86;
+pub const STX_ZP_CCOST: u32 = 3;
 
 // Addressing Mode: Y-Indexed Zero Page
 // Opcode:          $96
 // Bytes:           2
 // Cycles:          4
 pub const STX_ZPY: Byte = 0x96;
+pub const STX_ZPY_CCOST: u32 = 4;
 
 ////////// Store Index Register Y in Memory (STY) //////////
 //
@@ -208,18 +235,21 @@ pub const STX_ZPY: Byte = 0x96;
 // Bytes:           3
 // Cycles:          4
 pub const STY_ABS: Byte = 0x8C;
+pub const STY_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $84
 // Bytes:           2
 // Cycles:          3
 pub const STY_ZP: Byte = 0x84;
+pub const STY_ZP_CCOST: u32 = 3;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $94
 // Bytes:           2
 // Cycles:          4
 pub const STY_ZPX: Byte = 0x94;
+pub const STY_ZPX_CCOST: u32 = 4;
 
 ////////// Transfer Accumulator to Index X (TAX) //////////
 //
@@ -230,6 +260,7 @@ pub const STY_ZPX: Byte = 0x94;
 // Bytes:           1
 // Cycles:          2
 pub const TAX_IMP: Byte = 0xAA;
+pub const TAX_IMP_CCOST: u32 = 2;
 
 ////////// Transfer Accumulator to Index Y //////////
 //
@@ -240,6 +271,7 @@ pub const TAX_IMP: Byte = 0xAA;
 // Bytes:           1
 // Cycles:          2
 pub const TAY_IMP: Byte = 0xA8;
+pub const TAY_IMP_CCOST: u32 = 2;
 
 ////////// Transfer Stack Pointer to Index X (TSX) //////////
 //
@@ -250,6 +282,7 @@ pub const TAY_IMP: Byte = 0xA8;
 // Bytes:           1
 // Cycles:          2
 pub const TSX_IMP: Byte = 0xBA;
+pub const TSX_IMP_CCOST: u32 = 2;
 
 ////////// Transfer Index X to Accumulator (TXA) //////////
 //
@@ -260,6 +293,7 @@ pub const TSX_IMP: Byte = 0xBA;
 // Bytes:           1
 // Cycles:          2
 pub const TXA_IMP: Byte = 0x8A;
+pub const TXA_IMP_CCOST: u32 = 2;
 
 ////////// Transfer Index X to Stack Pointer (TXS) //////////
 //
@@ -270,6 +304,7 @@ pub const TXA_IMP: Byte = 0x8A;
 // Bytes:           1
 // Cycles:          2
 pub const TXS_IMP: Byte = 0x9A;
+pub const TXS_IMP_CCOST: u32 = 2;
 
 ////////// Transfer Index Y to Accumulator (TYA) //////////
 //
@@ -280,6 +315,7 @@ pub const TXS_IMP: Byte = 0x9A;
 // Bytes:           1
 // Cycles:          2
 pub const TYA_IMP: Byte = 0x98;
+pub const TYA_IMP_CCOST: u32 = 2;
 
 ////////// Push Accumulator on Stack (PHA) //////////
 //
@@ -290,6 +326,7 @@ pub const TYA_IMP: Byte = 0x98;
 // Bytes:           1
 // Cycles:          3
 pub const PHA_IMP: Byte = 0x48;
+pub const PHA_IMP_CCOST: u32 = 3;
 
 ////////// Push Processor Status on Stack (PHP) //////////
 //
@@ -300,6 +337,7 @@ pub const PHA_IMP: Byte = 0x48;
 // Bytes:           1
 // Cycles:          3
 pub const PHP_IMP: Byte = 0x08;
+pub const PHP_IMP_CCOST: u32 = 3;
 
 ////////// Pull Accumulator from Stack (PLA) //////////
 //
@@ -310,6 +348,7 @@ pub const PHP_IMP: Byte = 0x08;
 // Bytes:           1
 // Cycles:          4
 pub const PLA_IMP: Byte = 0x68;
+pub const PLA_IMP_CCOST: u32 = 4;
 
 ////////// Pull Processor Status from Stack (PLP) //////////
 //
@@ -320,6 +359,7 @@ pub const PLA_IMP: Byte = 0x68;
 // Bytes:           1
 // Cycles:          4
 pub const PLP_IMP: Byte = 0x28;
+pub const PLP_IMP_CCOST: u32 = 4;
 
 ////////// Arithmetic Shift Left (ASL) //////////
 //
@@ -330,30 +370,35 @@ pub const PLP_IMP: Byte = 0x28;
 // Bytes:           1
 // Cycles:          2
 pub const ASL_ACC: Byte = 0x0A;
+pub const ASL_ACC_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $0E
 // Bytes:           3
 // Cycles:          6
 pub const ASL_ABS: Byte = 0x0E;
+pub const ASL_ABS_CCOST: u32 = 6;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $1E
 // Bytes:           3
 // Cycles:          7
 pub const ASL_ABSX: Byte = 0x1E;
+pub const ASL_ABSX_CCOST: u32 = 7;
 
 // Addressing Mode: Zero Page
 // Opcode:          $06
 // Bytes:           2
 // Cycles:          5
 pub const ASL_ZP: Byte = 0x06;
+pub const ASL_ZP_CCOST: u32 = 5;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $16
 // Bytes:           2
 // Cycles:          6
 pub const ASL_ZPX: Byte = 0x16;
+pub const ASL_ZPX_CCOST: u32 = 6;
 
 ////////// Logical Shift Right (LSR) //////////
 //
@@ -364,30 +409,35 @@ pub const ASL_ZPX: Byte = 0x16;
 // Bytes:           1
 // Cycles:          2
 pub const LSR_ACC: Byte = 0x4A;
+pub const LSR_ACC_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $4E
 // Bytes:           3
 // Cycles:          6
 pub const LSR_ABS: Byte = 0x4E;
+pub const LSR_ABS_CCOST: u32 = 6;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $5E
 // Bytes:           3
 // Cycles:          7
 pub const LSR_ABSX: Byte = 0x5E;
+pub const LSR_ABSX_CCOST: u32 = 7;
 
 // Addressing Mode: Zero Page
 // Opcode:          $46
 // Bytes:           2
 // Cycles:          5
 pub const LSR_ZP: Byte = 0x46;
+pub const LSR_ZP_CCOST: u32 = 5;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $56
 // Bytes:           2
 // Cycles:          6
 pub const LSR_ZPX: Byte = 0x56;
+pub const LSR_ZPX_CCOST: u32 = 6;
 
 ////////// Rotate Left (ROL) //////////
 //
@@ -398,30 +448,35 @@ pub const LSR_ZPX: Byte = 0x56;
 // Bytes:           1
 // Cycles:          2
 pub const ROL_ACC: Byte = 0x2A;
+pub const ROL_ACC_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $2E
 // Bytes:           3
 // Cycles:          6
 pub const ROL_ABS: Byte = 0x2E;
+pub const ROL_ABS_CCOST: u32 = 6;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $3E
 // Bytes:           3
 // Cycles:          7
 pub const ROL_ABSX: Byte = 0x3E;
+pub const ROL_ABSX_CCOST: u32 = 7;
 
 // Addressing Mode: Zero Page
 // Opcode:          $26
 // Bytes:           2
 // Cycles:          5
 pub const ROL_ZP: Byte = 0x26;
+pub const ROL_ZP_CCOST: u32 = 5;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $36
 // Bytes:           2
 // Cycles:          6
 pub const ROL_ZPX: Byte = 0x36;
+pub const ROL_ZPX_CCOST: u32 = 6;
 
 ////////// Rotate Right (ROR) //////////
 //
@@ -432,30 +487,35 @@ pub const ROL_ZPX: Byte = 0x36;
 // Bytes:           1
 // Cycles:          2
 pub const ROR_ACC: Byte = 0x6A;
+pub const ROR_ACC_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $6E
 // Bytes:           3
 // Cycles:          6
 pub const ROR_ABS: Byte = 0x6E;
+pub const ROR_ABS_CCOST: u32 = 6;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $7E
 // Bytes:           3
 // Cycles:          7
 pub const ROR_ABSX: Byte = 0x7E;
+pub const ROR_ABSX_CCOST: u32 = 7;
 
 // Addressing Mode: Zero Page
 // Opcode:          $66
 // Bytes:           2
 // Cycles:          5
 pub const ROR_ZP: Byte = 0x66;
+pub const ROR_ZP_CCOST: u32 = 5;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $76
 // Bytes:           2
 // Cycles:          6
 pub const ROR_ZPX: Byte = 0x76;
+pub const ROR_ZPX_CCOST: u32 = 6;
 
 ////////// AND Memory with Accumulator (AND) //////////
 //
@@ -466,48 +526,56 @@ pub const ROR_ZPX: Byte = 0x76;
 // Bytes:           2
 // Cycles:          2
 pub const AND_IMM: Byte = 0x29;
+pub const AND_IMM_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $2D
 // Bytes:           3
 // Cycles:          4
 pub const AND_ABS: Byte = 0x2D;
+pub const AND_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $3D
 // Bytes:           3
 // Cycles:          ~4
 pub const AND_ABSX: Byte = 0x3D;
+pub const AND_ABSX_CCOST: u32 = 4;
 
 // Addressing Mode: Y-Indexed Absolute
 // Opcode:          $39
 // Bytes:           3
 // Cycles:          ~4
 pub const AND_ABSY: Byte = 0x39;
+pub const AND_ABSY_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $25
 // Bytes:           2
 // Cycles:          3
 pub const AND_ZP: Byte = 0x25;
+pub const AND_ZP_CCOST: u32 = 3;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $35
 // Bytes:           2
 // Cycles:          4
 pub const AND_ZPX: Byte = 0x25;
+pub const AND_ZPX_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Zero Page Indirect
 // Opcode:          $21
 // Bytes:           2
 // Cycles:          6
 pub const AND_ZPX_IND: Byte = 0x21;
+pub const AND_ZPX_IND_CCOST: u32 = 6;
 
 // Addressing Mode: Zero Page Indirect Y-Index
 // Opcode:          $31
 // Bytes:           2
 // Cycles:          ~5
 pub const AND_ZPY_IND: Byte = 0x31;
+pub const AND_ZPY_IND_CCOST: u32 = 5;
 
 ////////// Test Bits in Memory with Accumulator (BIT) //////////
 //
@@ -518,12 +586,14 @@ pub const AND_ZPY_IND: Byte = 0x31;
 // Bytes:           3
 // Cycles:          4
 pub const BIT_ABS: Byte = 0x2C;
+pub const BIT_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $24
 // Bytes:           2
 // Cycles:          3
 pub const BIT_ZP: Byte = 0x24;
+pub const BIT_ZP_CCOST: u32 = 3;
 
 ////////// Exclusive OR Memory with Accumulator (EOR) //////////
 
@@ -532,48 +602,56 @@ pub const BIT_ZP: Byte = 0x24;
 // Bytes:           2
 // Cycles:          2
 pub const EOR_IMM: Byte = 0x49;
+pub const EOR_IMM_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $4D
 // Bytes:           3
 // Cycles:          4
 pub const EOR_ABS: Byte = 0x4D;
+pub const EOR_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $5D
 // Bytes:           3
 // Cycles:          ~4
 pub const EOR_ABSX: Byte = 0x5D;
+pub const EOR_ABSX_CCOST: u32 = 4;
 
 // Addressing Mode: Y-Indexed Absolute
 // Opcode:          $59
 // Bytes:           3
 // Cycles:          ~4
 pub const EOR_ABSY: Byte = 0x59;
+pub const EOR_ABSY_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $45
 // Bytes:           2
 // Cycles:          3
 pub const EOR_ZP: Byte = 0x45;
+pub const EOR_ZP_CCOST: u32 = 3;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $55
 // Bytes:           2
 // Cycles:          4
 pub const EOR_ZPX: Byte = 0x55;
+pub const EOR_ZPX_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Zero Page Indirect
 // Opcode:          $41
 // Bytes:           2
 // Cycles:          6
 pub const EOR_ZPX_IND: Byte = 0x41;
+pub const EOR_ZPX_IND_CCOST: u32 = 6;
 
 // Addressing Mode: Zero Page Indirect Y-Indexed
 // Opcode:          $51
 // Bytes:           2
 // Cycles:          ~5
 pub const EOR_ZPY_IND: Byte = 0x51;
+pub const EOR_ZPY_IND_CCOST: u32 = 5;
 
 ////////// OR Memory with Accumulator (ORA) //////////
 //
@@ -584,48 +662,56 @@ pub const EOR_ZPY_IND: Byte = 0x51;
 // Bytes:           2
 // Cycles:          2
 pub const ORA_IMM: Byte = 0x09;
+pub const ORA_IMM_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $0D
 // Bytes:           3
 // Cycles:          4
 pub const ORA_ABS: Byte = 0x0D;
+pub const ORA_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $1D
 // Bytes:           3
 // Cycles:          ~4
 pub const ORA_ABSX: Byte = 0x1D;
+pub const ORA_ABSX_CCOST: u32 = 4;
 
 // Addressing Mode: Y-Indexed Absolute
 // Opcode:          $19
 // Bytes:           3
 // Cycles:          ~4
 pub const ORA_ABSY: Byte = 0x19;
+pub const ORA_ABSY_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $05
 // Bytes:           2
 // Cycles:          3
 pub const ORA_ZP: Byte = 0x05;
+pub const ORA_ZP_CCOST: u32 = 3;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $15
 // Bytes:           2
 // Cycles:          4
 pub const ORA_ZPX: Byte = 0x15;
+pub const ORA_ZPX_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Zero Page Indirect
 // Opcode:          $01
 // Bytes:           2
 // Cycles:          6
 pub const ORA_ZPX_IND: Byte = 0x01;
+pub const ORA_ZPX_IND_CCOST: u32 = 6;
 
 // Addressing Mode: Zero Page Indirect Y-Indexed
 // Opcode:          $11
 // Bytes:           2
 // Cycles:          ~5
 pub const ORA_ZPY_IND: Byte = 0x11;
+pub const ORA_ZPY_IND_CCOST: u32 = 5;
 
 ////////// Add Memory to Accumulator with Carry (ADC) //////////
 //
@@ -638,48 +724,56 @@ pub const ORA_ZPY_IND: Byte = 0x11;
 // Bytes:           2
 // Cycles:          2
 pub const ADC_IMM: Byte = 0x69;
+pub const ADC_IMM_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $6D
 // Bytes:           3
 // Cycles:          4
 pub const ADC_ABS: Byte = 0x6D;
+pub const ADC_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $7D
 // Bytes:           3
 // Cycles:          ~4
 pub const ADC_ABSX: Byte = 0x7D;
+pub const ADC_ABSX_CCOST: u32 = 4;
 
 // Addressing Mode: Y-Indexed Absolute
 // Opcode:          $79
 // Bytes:           3
 // Cycles:          ~4
 pub const ADC_ABSY: Byte = 0x79;
+pub const ADC_ABSY_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $65
 // Bytes:           2
 // Cycles:          3
 pub const ADC_ZP: Byte = 0x65;
+pub const ADC_ZP_CCOST: u32 = 3;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $75
 // Bytes:           2
 // Cycles:          4
 pub const ADC_ZPX: Byte = 0x75;
+pub const ADC_ZPX_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Zero Page Indirect
 // Opcode:          $61
 // Bytes:           2
 // Cycles:          6
 pub const ADC_ZPX_IND: Byte = 0x61;
+pub const ADC_ZPX_IND_CCOST: u32 = 6;
 
 // Addressing Mode: Zero Page Indirect Y-Indexed
 // Opcode:          $71
 // Bytes:           2
 // Cycles:          ~5
 pub const ADC_ZPY_IND: Byte = 0x71;
+pub const ADC_ZPY_IND_CCOST: u32 = 5;
 
 ////////// Compare Memory and Accumulator (CMP) //////////
 //
@@ -690,36 +784,42 @@ pub const ADC_ZPY_IND: Byte = 0x71;
 // Bytes:           2
 // Cycles:          2
 pub const CMP_IMM: Byte = 0xC9;
+pub const CMP_IMM_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $CD
 // Bytes:           2
 // Cycles:          4
 pub const CMP_ABS: Byte = 0xCD;
+pub const CMP_ABS_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Absolute
 // Opcode:          $DD
 // Bytes:           3
 // Cycles:          ~4
 pub const CMP_ABSX: Byte = 0xDD;
+pub const CMP_ABSX_CCOST: u32 = 4;
 
 // Addressing Mode: Y-Indexed Absolute
 // Opcode:          $D9
 // Bytes:           3
 // Cycles:          ~4
 pub const CMP_ABSY: Byte = 0xD9;
+pub const CMP_ABSY_CCOST: u32 = 4;
 
 // Addressing Mode: Zero Page
 // Opcode:          $C5
 // Bytes:           2
 // Cycles:          3
 pub const CMP_ZP: Byte = 0xC5;
+pub const CMP_ZP_CCOST: u32 = 3;
 
 // Addressing Mode: X-Indexed Zero Page
 // Opcode:          $D5
 // Bytes:           2
 // Cycles:          4
 pub const CMP_ZPX: Byte = 0xD5;
+pub const CMP_ZPX_CCOST: u32 = 4;
 
 // Addressing Mode: X-Indexed Zero Page Indirect
 // Opcode:          $C1

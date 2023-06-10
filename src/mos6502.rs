@@ -87,23 +87,21 @@ impl Mos6502 {
     }
 
     fn fetch_byte(&mut self, mem: &Memory) -> Byte {
-        let b = mem.get_byte(self.pc as usize);
+        let b: Byte = mem.get_byte(self.pc as usize);
         self.increment_program_counter(1);
         self.use_cycles(1);
         b
     }
 
     fn fetch_word(&mut self, mem: &mut Memory) -> Word {
-        // let w1 = mem.get_byte(self.pc as usize) as Word;
-        // let w2 = mem.get_byte((self.pc + 1) as usize) as Word;
         let w1 = u16::from(mem.get_byte(self.pc as usize));
         let w2 = u16::from(mem.get_byte((self.pc + 1) as usize));
-        self.pc += 2;
-        self.cycles -= 2;
+        self.increment_program_counter(2);
+        self.use_cycles(2);
         (w1 << 8) | w2
     }
 
-    ////////// UPDATE STATUS FUNCTIONS //////////
+    ////////// SET STATUS FUNCTIONS //////////
 
     fn lda_set_status(&mut self) {
         if self.acc == 0 {
