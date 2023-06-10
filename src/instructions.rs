@@ -55,6 +55,7 @@ pub const LDA_ZP_CCOST: u32 = 3;
 // Opcode:          $B5
 // Bytes:           2
 // Cycles:          4
+// Status:          DONE
 pub const LDA_ZPX: Byte = 0xB5;
 pub const LDA_ZPX_CCOST: u32 = 4;
 

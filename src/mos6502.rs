@@ -6,14 +6,14 @@ type Word = u16;
 
 #[allow(dead_code)]
 enum Mos6502Flags {
-    C = 0, // Carry bit.
-    Z = 1, // Zero.
-    I = 2, // Disable interrupts.
-    D = 3, // Decimal mode (unused).
-    B = 4, // Break.
-    U = 5, // Unused.
-    V = 6, // Overflow.
-    N = 7, // Negative.
+    C = 0, // Carry
+    Z = 1, // Zero
+    I = 2, // Disable interrupts
+    D = 3, // Decimal mode (unused)
+    B = 4, // Break
+    U = 5, // Unused
+    V = 6, // Overflow
+    N = 7, // Negative
 }
 
 impl Mos6502Flags {
@@ -72,6 +72,7 @@ impl Mos6502 {
             match instr {
                 instructions::LDA_IMM => self.lda_imm(mem, instructions::LDA_IMM_COST),
                 instructions::LDA_ZP => self.lda_zp(mem, instructions::LDA_ZP_CCOST),
+                instructions::LDA_ZPX => self.lda_zpx(mem, instructions::LDA_ZPX_CCOST),
                 instructions::CLC_IMP => self.clc_imp(instructions::CLC_IMP_CCOST),
                 instructions::CLD_IMP => self.cld_imp(instructions::CLD_IMP_CCOST),
                 instructions::CLI_IMP => self.cli_imp(instructions::CLI_IMP_CCOST),
@@ -146,13 +147,21 @@ impl Mos6502 {
 
     fn lda_imm(&mut self, mem: &Memory, cycle_cost: u32) {
         self.acc = self.fetch_byte(mem);
-        self.use_cycles(cycle_cost);
         self.lda_set_status();
+        self.use_cycles(cycle_cost);
     }
 
     fn lda_zp(&mut self, mem: &Memory, cycle_cost: u32) {
         let zpaddr = self.fetch_byte(mem);
         self.acc = self.read_byte(zpaddr, mem);
+        self.lda_set_status();
+        self.use_cycles(cycle_cost);
+    }
+
+    fn lda_zpx(&mut self, mem: &Memory, cycle_cost: u32) {
+        let zpaddr = self.fetch_byte(mem) + self.x;
+        self.acc = self.read_byte(zpaddr, mem);
+        self.lda_set_status();
         self.use_cycles(cycle_cost);
     }
 
