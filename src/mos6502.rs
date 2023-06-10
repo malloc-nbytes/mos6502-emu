@@ -331,8 +331,12 @@ impl Mos6502 {
 
     pub fn exe(&mut self) {
         while self.cycles > 0 {
-            let _instr: Byte = self.fetch_byte();
-            todo!()
+            let opcode: Byte = self.fetch_byte();
+            if let Some(instruction) = LOOKUP[opcode as usize] {
+                instruction(self);
+            } else {
+                println!("Illegal opcode: {opcode}");
+            }
         }
     }
 
@@ -395,27 +399,7 @@ impl Mos6502 {
 
     ////////// CPU INSTRUCTION FUNCTIONS //////////
 
-    fn brk_imp(&mut self) {
-        todo!()
-    }
-
-    fn ora_zpx_ind(&mut self) {
-        todo!()
-    }
-
-    fn ora_zp(&mut self) {
-        todo!()
-    }
-
     fn asl_zp(&mut self) {
-        todo!()
-    }
-
-    fn php_imp(&mut self) {
-        todo!()
-    }
-
-    fn ora_imm(&mut self) {
         todo!()
     }
 
@@ -423,23 +407,7 @@ impl Mos6502 {
         todo!()
     }
 
-    fn ora_abs(&mut self) {
-        todo!()
-    }
-
     fn asl_abs(&mut self) {
-        todo!()
-    }
-
-    fn bpl_rel(&mut self) {
-        todo!()
-    }
-
-    fn ora_zpy_ind(&mut self) {
-        todo!()
-    }
-
-    fn ora_zpx(&mut self) {
         todo!()
     }
 
@@ -447,24 +415,7 @@ impl Mos6502 {
         todo!()
     }
 
-    fn clc_imp(&mut self) {
-        Mos6502Flags::C.clear(&mut self.status);
-        self.use_cycles(instructions::CLC_IMP_CCOST);
-    }
-
-    fn ora_absy(&mut self) {
-        todo!()
-    }
-
-    fn ora_absx(&mut self) {
-        todo!()
-    }
-
     fn asl_absx(&mut self) {
-        todo!()
-    }
-
-    fn jmp_sr_abs(&mut self) {
         todo!()
     }
 
@@ -472,31 +423,7 @@ impl Mos6502 {
         todo!()
     }
 
-    fn bit_zp(&mut self) {
-        todo!()
-    }
-
     fn and_zp(&mut self) {
-        todo!()
-    }
-
-    fn rol_zp(&mut self) {
-        todo!()
-    }
-
-    fn plp_imp(&mut self) {
-        todo!()
-    }
-
-    fn and_imm(&mut self) {
-        todo!()
-    }
-
-    fn rol_acc(&mut self) {
-        todo!()
-    }
-
-    fn bit_abs(&mut self) {
         todo!()
     }
 
@@ -504,11 +431,7 @@ impl Mos6502 {
         todo!()
     }
 
-    fn rol_abs(&mut self) {
-        todo!()
-    }
-
-    fn bmi_rel(&mut self) {
+    fn and_imm(&mut self) {
         todo!()
     }
 
@@ -520,6 +443,95 @@ impl Mos6502 {
         todo!()
     }
 
+    fn and_absy(&mut self) {
+        todo!()
+    }
+
+    fn and_absx(&mut self) {
+        todo!()
+    }
+
+    fn ora_zpx_ind(&mut self) {
+        todo!()
+    }
+
+    fn ora_zp(&mut self) {
+        todo!()
+    }
+
+    fn ora_imm(&mut self) {
+        todo!()
+    }
+
+    fn ora_abs(&mut self) {
+        todo!()
+    }
+
+    fn ora_zpy_ind(&mut self) {
+        todo!()
+    }
+
+    fn ora_zpx(&mut self) {
+        todo!()
+    }
+
+    fn ora_absy(&mut self) {
+        todo!()
+    }
+
+    fn ora_absx(&mut self) {
+        todo!()
+    }
+
+    fn brk_imp(&mut self) {
+        todo!()
+    }
+
+    fn php_imp(&mut self) {
+        todo!()
+    }
+
+    fn bpl_rel(&mut self) {
+        todo!()
+    }
+
+    fn clc_imp(&mut self) {
+        Mos6502Flags::C.clear(&mut self.status);
+        self.use_cycles(instructions::CLC_IMP_CCOST);
+    }
+
+    fn jmp_sr_abs(&mut self) {
+        todo!()
+    }
+
+    fn bit_zp(&mut self) {
+        todo!()
+    }
+
+    fn rol_zp(&mut self) {
+        todo!()
+    }
+
+    fn plp_imp(&mut self) {
+        todo!()
+    }
+
+    fn rol_acc(&mut self) {
+        todo!()
+    }
+
+    fn bit_abs(&mut self) {
+        todo!()
+    }
+
+    fn rol_abs(&mut self) {
+        todo!()
+    }
+
+    fn bmi_rel(&mut self) {
+        todo!()
+    }
+
     fn rol_zpx(&mut self) {
         todo!()
     }
@@ -527,14 +539,6 @@ impl Mos6502 {
     fn sec_imp(&mut self) {
         Mos6502Flags::C.set(&mut self.status);
         self.use_cycles(instructions::SEC_IMP_CCOST);
-    }
-
-    fn and_absy(&mut self) {
-        todo!()
-    }
-
-    fn and_absx(&mut self) {
-        todo!()
     }
 
     fn rol_absx(&mut self) {
