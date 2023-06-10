@@ -35,20 +35,20 @@ const STACKPTR_BEGIN: Byte = 0xFF;
 const PROGRAM_COUNTER_BEGIN: Word = 0xFFFC;
 
 pub struct Mos6502 {
-    acc: Byte,
+    a: Byte,
     x: Byte,
     y: Byte,
     status: Byte,
-    stackptr: Byte,
-    cycles: u32,
+    sp: Byte,
     pc: Word,
     mem: Memory,
+    cycles: u32,
 }
 
 impl std::fmt::Display for Mos6502 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "acc: {:x}\nx: {:x}\ny: {:x}\nstatus: {:x}\nstackptr: {:x}\npc: {:x}\ncycles: {:x}",
-               self.acc, self.x, self.y, self.status, self.stackptr, self.pc, self.cycles)
+        write!(f, "a: {:x}\nx: {:x}\ny: {:x}\nstatus: {:x}\nsp: {:x}\npc: {:x}\ncycles: {:x}",
+               self.a, self.x, self.y, self.status, self.sp, self.pc, self.cycles)
     }
 }
 
@@ -317,18 +317,18 @@ impl Mos6502 {
     pub fn new(cycles: Option<u32>, mem: Memory) -> Self {
         let c = match cycles { Some(k) => k, _ => 0 };
         Self {
-            acc: 0x00, x: 0x00, y: 0x00,
+            a: 0x00, x: 0x00, y: 0x00,
             status: 0x00, cycles: c,
-            stackptr: STACKPTR_BEGIN,
+            sp: STACKPTR_BEGIN,
             pc: PROGRAM_COUNTER_BEGIN,
             mem,
         }
     }
 
     pub fn reset(&mut self, cycles: Option<u32>) {
-        (self.acc, self.x, self.y, self.status) = (0x00, 0x00, 0x00, 0x00);
+        (self.a, self.x, self.y, self.status) = (0x00, 0x00, 0x00, 0x00);
         self.cycles = match cycles { Some(c) => c, _ => 0 };
-        self.stackptr = STACKPTR_BEGIN;
+        self.sp = STACKPTR_BEGIN;
         self.pc = PROGRAM_COUNTER_BEGIN;
         self.mem.clear();
     }
@@ -346,6 +346,14 @@ impl Mos6502 {
 
     fn cycle(&mut self) {
         self.cycles -= 1;
+    }
+
+    fn sp_push(&mut self) {
+        self.sp -= 1;
+    }
+
+    fn sp_pop(&mut self) {
+        self.sp += 1;
     }
 
     ////////// HELPER FUNCTIONS //////////
@@ -382,12 +390,12 @@ impl Mos6502 {
     ////////// SET STATUS FUNCTIONS //////////
 
     fn lda_set_status(&mut self) {
-        if self.acc == 0 {
+        if self.a == 0 {
             Mos6502Flags::Z.set(self);
         } else {
             Mos6502Flags::Z.clear(self);
         }
-        if self.acc & (1u8 << 7) == 0 {
+        if self.a & (1u8 << 7) == 0 {
             Mos6502Flags::N.clear(self);
         } else {
             Mos6502Flags::N.set(self);
@@ -780,7 +788,7 @@ impl Mos6502 {
     fn lda_zp(&mut self) {
         // TODO: address overflow.
         let zpaddr: Byte = self.fetch_byte();
-        self.acc = self.read_byte(zpaddr);
+        self.a = self.read_byte(zpaddr);
         self.lda_set_status();
     }
 
@@ -793,7 +801,7 @@ impl Mos6502 {
     }
 
     fn lda_imm(&mut self) {
-        self.acc = self.fetch_byte();
+        self.a = self.fetch_byte();
         self.lda_set_status();
     }
 
@@ -828,7 +836,7 @@ impl Mos6502 {
     fn lda_zpx(&mut self) {
         // TODO: address overflow.
         let zpaddr: Byte = self.fetch_byte() + self.x;
-        self.acc = self.read_byte(zpaddr);
+        self.a = self.read_byte(zpaddr);
         self.lda_set_status();
     }
 
