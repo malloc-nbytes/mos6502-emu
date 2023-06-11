@@ -343,10 +343,17 @@ impl Mos6502 {
         self.cycles -= 1;
     }
 
-    fn push(&mut self, addr: usize, data: Byte) {
+    fn push_byte(&mut self, addr: usize, data: Byte) {
         *self.mem.at(addr) = data;
         self.sp -= 1;
         self.cycle();
+    }
+
+    fn push_word(&mut self, addr: usize, data: Word) {
+        self.mem.write_word(addr, data);
+        self.cycle();
+        self.cycle();
+        self.sp -= 1;
     }
 
     fn pop(&mut self) {
@@ -531,11 +538,7 @@ impl Mos6502 {
 
     fn jsr_abs(&mut self) {
         let addr = self.fetch_word();
-
-        self.push(self.pc as usize, (self.pc - 1)
-                  .try_into()
-                  .unwrap());
-
+        self.push_word(self.pc as usize, self.pc - 1);
         self.pc_assign_wcycle(addr);
     }
 
