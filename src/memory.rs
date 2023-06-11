@@ -29,19 +29,9 @@ impl Memory {
         &mut self.data[idx]
     }
 
-    pub fn get_word_as_word(&mut self, addr: usize) -> Word {
-        let w1: Word = self.data[addr] as Word;
-        let w2: Word = self.data[addr + 1] as Word;
-        (w1 << 8) | w2
-    }
-
-    pub fn get_word_as_bytes(&mut self, addr: usize) -> (Byte, Byte) {
-        (self.data[addr], self.data[addr + 1])
-    }
-
     pub fn write_word(&mut self, addr: usize, data: Word) {
         self.data[addr] = (data & 0xFF) as Byte;
-        self.data[addr + 1] = (data >> 8) as Byte;
+        self.data[(addr + 1) % self.data.len()] = (data >> 8) as Byte;
     }
 
 }

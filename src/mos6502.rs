@@ -26,8 +26,6 @@ impl Mos6502Flags {
     }
 }
 
-const STACKPTR_BEGIN: Byte = 0xFD;
-
 pub struct Mos6502 {
     a: Byte,
     x: Byte,
@@ -312,7 +310,7 @@ impl Mos6502 {
         Self {
             a: 0x00, x: 0x00, y: 0x00,
             status: 0x00, cycles: 0,
-            sp: STACKPTR_BEGIN,
+            sp: 0xFF,
             pc: 0x0000,
             mem,
         }
@@ -326,8 +324,11 @@ impl Mos6502 {
         let lo: Byte = self.mem.get_byte(0xFFFC + 0);
         let hi: Byte = self.mem.get_byte(0xFFFC + 1);
 
-        self.pc = ((hi as Word) << 8u8) | lo as Word;
-        self.sp = STACKPTR_BEGIN;
+        println!("{hi}, {lo}");
+
+        // self.pc = ((hi as Word) << 8u8) | lo as Word;
+        self.pc = 0xFFFC;
+        self.sp = 0xFF;
 
         self.status = 0x00 | Mos6502Flags::U as Byte;
 
@@ -343,6 +344,10 @@ impl Mos6502 {
                 println!("Illegal opcode: {opcode}");
             }
         }
+    }
+
+    pub fn set_xreg(&mut self, data: Byte) {
+        self.x = data;
     }
 
     pub fn get_accumulator(&self) -> Byte {
@@ -408,7 +413,9 @@ impl Mos6502 {
     }
 
     fn add_offset_wcycle(&mut self, target: &mut Byte, offset: Byte) {
-        *target += offset;
+        let sum = *target as u16 + offset as u16;
+        let wrapped_sum = sum % 256;
+        *target = wrapped_sum as Byte;
         self.cycle();
     }
 
@@ -853,14 +860,12 @@ impl Mos6502 {
     }
 
     fn lda_zp(&mut self) {
-        // TODO: address overflow.
         let zpaddr: Byte = self.fetch_byte();
         self.a = self.read_byte_at_addr(zpaddr);
         self.lda_set_status();
     }
 
     fn lda_zpx(&mut self) {
-        // TODO: address overflow.
         let mut zpaddr: Byte = self.fetch_byte();
         self.add_offset_wcycle(&mut zpaddr, self.x);
         self.a = self.read_byte_at_addr(zpaddr);

@@ -5,24 +5,26 @@ mod mos6502;
 mod memory;
 mod tests;
 
+fn cpu_mem_set(instrs: Vec<(u16, u8)>) -> mos6502::Mos6502 {
+    let mut mem = memory::Memory::new();
+    for (addr, opcode) in instrs {
+        *mem.at(addr as usize) = opcode;
+    }
+    mos6502::Mos6502::new(mem)
+}
+
+
 #[allow(dead_code)]
 #[allow(unused_mut)]
 #[allow(unused_variables)]
 fn main() {
-    let mut mem = memory::Memory::new();
-
-    // inline
-    *mem.at(0x0000) = instructions::JSR_ABS;
-    *mem.at(0x0001) = 0x42;
-    *mem.at(0x0002) = 0x42;
-    *mem.at(0x4242) = instructions::LDA_IMM;
-    *mem.at(0x4243) = 0x84;
-    // end inline
-
-    let mut cpu = mos6502::Mos6502::new(mem);
-    cpu.reset(instructions::JSR_ABS_CCOST + instructions::LDA_IMM_CCOST);
-
+    let mut cpu = cpu_mem_set(vec![
+        (0x0000, instructions::LDA_ZPX),
+        (0x0001, 0x42),
+        (0x0047, 0x80),
+    ]);
+    cpu.reset(instructions::LDA_ZPX_CCOST);
+    cpu.set_xreg(5);
     cpu.exe();
-
     println!("{cpu}");
 }
