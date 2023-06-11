@@ -1089,14 +1089,14 @@ pub const JMP_ABS_IND_CCOST: u32 = 5;
 
 ////////// Jump to Subroutine (JSR) //////////
 //
-// Status Flags Affected: ∅
+// Status Flags Affected: ∅+
 
 // Addressing Mode: Absolute
 // Opcode:          $20
 // Bytes:           3
 // Cycles:          6
-pub const JMP_SR_ABS: Byte = 0x20;
-pub const JMP_SR_ABS_CCOST: u32 = 6;
+pub const JSR_ABS: Byte = 0x20;
+pub const JSR_ABS_CCOST: u32 = 6;
 
 ////////// Return From Interrupt (RTI) //////////
 //

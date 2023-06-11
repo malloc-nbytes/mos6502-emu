@@ -82,7 +82,7 @@ const LOOKUP: [Option<fn(&mut Mos6502)>; LOOKUP_TBL_SIZE] = [
     Some(Mos6502::ora_absx),
     Some(Mos6502::asl_absx),
     None,
-    Some(Mos6502::jmp_sr_abs),
+    Some(Mos6502::jsr_abs),
     Some(Mos6502::and_zpx_ind),
     None,
     None,
@@ -343,18 +343,46 @@ impl Mos6502 {
         self.cycles -= 1;
     }
 
-    fn sp_push(&mut self) {
+    fn push(&mut self, addr: usize, data: Byte) {
+        *self.mem.at(addr) = data;
         self.sp -= 1;
+        self.cycle();
     }
 
-    fn sp_pop(&mut self) {
+    fn pop(&mut self) {
         self.sp += 1;
+        self.cycle();
+    }
+
+    fn pc_assign_wcycle(&mut self, data: Word) {
+        self.pc = data;
+        self.cycle();
+    }
+
+    fn acc_assign_wcycle(&mut self, data: Byte) {
+        self.a = data;
+        self.cycle();
+    }
+
+    fn xreg_assign_wcycle(&mut self, data: Byte) {
+        self.x = data;
+        self.cycle();
+    }
+
+    fn yreg_assign_wcycle(&mut self, data: Byte) {
+        self.y = data;
+        self.cycle();
+    }
+
+    fn add_offset_wcycle(&mut self, target: &mut Byte, offset: Byte) {
+        *target += offset;
+        self.cycle();
     }
 
     ////////// HELPER FUNCTIONS //////////
 
-    fn increment_pc(&mut self, increment: Word) {
-        self.pc += increment;
+    fn program_counter(&mut self) {
+        self.pc += 1;
     }
 
     fn read_byte_at_addr(&mut self, addr: Byte) -> Byte {
@@ -366,19 +394,20 @@ impl Mos6502 {
 
     fn fetch_byte(&mut self) -> Byte {
         let b: Byte = self.mem.get_byte(self.pc as usize);
-        self.increment_pc(1);
+        self.program_counter();
         self.cycle();
         b
     }
 
     fn fetch_word(&mut self) -> Word {
         let w1 = u16::from(self.mem.get_byte(self.pc as usize));
+        self.program_counter();
         self.cycle();
 
-        let w2 = u16::from(self.mem.get_byte((self.pc + 1) as usize));
+        let w2 = u16::from(self.mem.get_byte(self.pc as usize));
+        self.program_counter();
         self.cycle();
 
-        self.increment_pc(2);
         (w1 << 8) | w2
     }
 
@@ -497,10 +526,17 @@ impl Mos6502 {
 
     fn clc_imp(&mut self) {
         Mos6502Flags::C.clear(&mut self.status);
+        todo!("cycles");
     }
 
-    fn jmp_sr_abs(&mut self) {
-        todo!()
+    fn jsr_abs(&mut self) {
+        let addr = self.fetch_word();
+
+        self.push(self.pc as usize, (self.pc - 1)
+                  .try_into()
+                  .unwrap());
+
+        self.pc_assign_wcycle(addr);
     }
 
     fn bit_zp(&mut self) {
@@ -537,6 +573,7 @@ impl Mos6502 {
 
     fn sec_imp(&mut self) {
         Mos6502Flags::C.set(&mut self.status);
+        todo!("cycles");
     }
 
     fn rol_absx(&mut self) {
@@ -601,6 +638,7 @@ impl Mos6502 {
 
     fn cli_imp(&mut self) {
         Mos6502Flags::I.clear(&mut self.status);
+        todo!("cycles");
     }
 
     fn eor_absy(&mut self) {
@@ -677,6 +715,7 @@ impl Mos6502 {
 
     fn sei_imp(&mut self) {
         Mos6502Flags::I.set(&mut self.status);
+        todo!("cycles");
     }
 
     fn adc_absy(&mut self) {
@@ -793,7 +832,8 @@ impl Mos6502 {
 
     fn lda_zpx(&mut self) {
         // TODO: address overflow.
-        let zpaddr: Byte = self.fetch_byte() + self.x;
+        let mut zpaddr: Byte = self.fetch_byte();
+        self.add_offset_wcycle(&mut zpaddr, self.x);
         self.a = self.read_byte_at_addr(zpaddr);
         self.lda_set_status();
     }

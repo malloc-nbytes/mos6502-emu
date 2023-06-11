@@ -20,6 +20,10 @@ impl Memory {
         self.data[idx]
     }
 
+    pub fn insert_byte(&mut self, idx: usize, data: Byte) {
+        self.data[idx] = data;
+    }
+
     pub fn at(&mut self, idx: usize) -> &mut Byte {
         &mut self.data[idx]
     }
