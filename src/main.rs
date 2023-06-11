@@ -3,6 +3,7 @@
 mod instructions;
 mod mos6502;
 mod memory;
+mod tests;
 
 #[allow(dead_code)]
 #[allow(unused_mut)]
@@ -18,20 +19,10 @@ fn main() {
     *mem.at(0x4243) = 0x84;
     // end inline
 
-    let mut cpu = mos6502::Mos6502::new(None, mem);
-
-    cpu.reset(Some(instructions::JSR_ABS_CCOST + instructions::LDA_IMM_CCOST));
+    let mut cpu = mos6502::Mos6502::new(mem);
+    cpu.reset(instructions::JSR_ABS_CCOST + instructions::LDA_IMM_CCOST);
 
     cpu.exe();
 
     println!("{cpu}");
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    #[test]
-    fn test1() {
-        unimplemented!();
-    }
 }

@@ -308,21 +308,20 @@ const LOOKUP: [Option<fn(&mut Mos6502)>; LOOKUP_TBL_SIZE] = [
 ];
 
 impl Mos6502 {
-    pub fn new(cycles: Option<u32>, mem: Memory) -> Self {
-        let c = match cycles { Some(k) => k, _ => 0 };
+    pub fn new(mem: Memory) -> Self {
         Self {
             a: 0x00, x: 0x00, y: 0x00,
-            status: 0x00, cycles: c,
+            status: 0x00, cycles: 0,
             sp: STACKPTR_BEGIN,
             pc: 0x0000,
             mem,
         }
     }
 
-    pub fn reset(&mut self, cycles: Option<u32>) {
-        (self.a, self.x, self.y, self.status) = (0x00, 0x00, 0x00, 0x00);
+    pub fn reset(&mut self, cycles: u32) {
+        (self.a, self.x, self.y) = (0x00, 0x00, 0x00);
 
-        self.cycles = match cycles { Some(c) => c, _ => 0 };
+        self.cycles = cycles;
 
         let lo: Byte = self.mem.get_byte(0xFFFC + 0);
         let hi: Byte = self.mem.get_byte(0xFFFC + 1);
@@ -338,13 +337,32 @@ impl Mos6502 {
     pub fn exe(&mut self) {
         while self.cycles > 0 {
             let opcode: Byte = self.fetch_byte();
-            println!("opcode: {opcode:x}");
             if let Some(instruction) = LOOKUP[opcode as usize] {
                 instruction(self);
             } else {
                 println!("Illegal opcode: {opcode}");
             }
         }
+    }
+
+    pub fn get_accumulator(&self) -> Byte {
+        self.a
+    }
+
+    pub fn get_yreg(&self) -> Byte {
+        self.y
+    }
+
+    pub fn get_xreg(&self) -> Byte {
+        self.x
+    }
+
+    pub fn get_status(&self) -> Byte {
+        self.status
+    }
+
+    pub fn get_cycles(&self) -> u32 {
+        self.cycles
     }
 
     fn cycle(&mut self) {
@@ -826,7 +844,6 @@ impl Mos6502 {
     }
 
     fn lda_imm(&mut self) {
-        println!("Here");
         self.a = self.fetch_byte();
         self.lda_set_status();
     }
