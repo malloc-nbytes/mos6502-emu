@@ -5,10 +5,11 @@ use crate::memory::Memory;
 type Byte = u8;
 type Word = u16;
 
-enum Mos6502Flags {
+#[derive(PartialEq)]
+pub enum Mos6502Flags {
     C = 1 << 0, // Carry
     Z = 1 << 1, // Zero
-    I = 1 << 2, // Disable interrupts
+    I = 1 << 2, // Interrupts disable
     D = 1 << 3, // Decimal mode (unused)
     B = 1 << 4, // Break
     U = 1 << 5, // Unused
@@ -21,8 +22,12 @@ impl Mos6502Flags {
         *status |= self as Byte;
     }
 
-    pub fn clear(self, status: &mut Byte) {
+    fn clear(self, status: &mut Byte) {
         *status &= !(self as Byte);
+    }
+
+    fn get(self, status: Byte) -> bool {
+        status & self as Byte != 0
     }
 }
 
@@ -306,6 +311,9 @@ const LOOKUP: [Option<fn(&mut Mos6502)>; LOOKUP_TBL_SIZE] = [
 ];
 
 impl Mos6502 {
+
+    ////////// PUBLIC FUNCTIONS //////////
+
     pub fn new(mem: Memory) -> Self {
         Self {
             a: 0x00, x: 0x00, y: 0x00,
@@ -321,16 +329,15 @@ impl Mos6502 {
 
         self.cycles = cycles;
 
-        let lo: Byte = self.mem.get_byte(0xFFFC + 0);
-        let hi: Byte = self.mem.get_byte(0xFFFC + 1);
-
-        println!("{hi}, {lo}");
-
+        // let lo: Byte = self.mem.get_byte(0xFFFC + 0);
+        // let hi: Byte = self.mem.get_byte(0xFFFC + 1);
         // self.pc = ((hi as Word) << 8u8) | lo as Word;
+        // self.status = 0x00 | Mos6502Flags::U as Byte;
+
         self.pc = 0xFFFC;
         self.sp = 0xFF;
 
-        self.status = 0x00 | Mos6502Flags::U as Byte;
+        self.status = 0x00;
 
         // TODO: increment cycles by 8.
     }
@@ -344,6 +351,38 @@ impl Mos6502 {
                 println!("Illegal opcode: {opcode}");
             }
         }
+    }
+
+    pub fn zero_flag(&self) -> bool {
+        Mos6502Flags::Z.get(self.status)
+    }
+
+    pub fn negative_flag(&self) -> bool {
+        Mos6502Flags::N.get(self.status)
+    }
+
+    pub fn carry_flag(&self) -> bool {
+        Mos6502Flags::C.get(self.status)
+    }
+
+    pub fn interrupts_disable_flag(&self) -> bool {
+        Mos6502Flags::I.get(self.status)
+    }
+
+    pub fn decimal_mode_flag(&self) -> bool {
+        Mos6502Flags::D.get(self.status)
+    }
+
+    pub fn break_flag(&self) -> bool {
+        Mos6502Flags::B.get(self.status)
+    }
+
+    pub fn unused_flag(&self) -> bool {
+        Mos6502Flags::U.get(self.status)
+    }
+
+    pub fn overflow_flag(&self) -> bool {
+        Mos6502Flags::V.get(self.status)
     }
 
     pub fn set_xreg(&mut self, data: Byte) {
