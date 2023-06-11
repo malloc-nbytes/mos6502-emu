@@ -2,9 +2,6 @@
 
 use crate::memory::Memory;
 
-#[allow(unused_imports)]
-use crate::instructions;
-
 type Byte = u8;
 type Word = u16;
 
@@ -20,14 +17,12 @@ enum Mos6502Flags {
 }
 
 impl Mos6502Flags {
-    pub fn set(self, mos: &mut Mos6502) {
-        mos.status |= self as Byte;
-        mos.cycle();
+    pub fn set(self, status: &mut Byte) {
+        *status |= self as Byte;
     }
 
-    pub fn clear(self, mos: &mut Mos6502) {
-        mos.status &= !(self as Byte);
-        mos.cycle();
+    pub fn clear(self, status: &mut Byte) {
+        *status &= !(self as Byte);
     }
 }
 
@@ -358,11 +353,11 @@ impl Mos6502 {
 
     ////////// HELPER FUNCTIONS //////////
 
-    fn decrement_program_counter(&mut self, increment: Word) {
-        self.pc -= increment;
+    fn increment_pc(&mut self, increment: Word) {
+        self.pc += increment;
     }
 
-    fn read_byte(&mut self, addr: Byte) -> Byte {
+    fn read_byte_at_addr(&mut self, addr: Byte) -> Byte {
         // NOTE: This function is needed to retrieve a byte
         // and not increment the program counter.
         self.cycle();
@@ -371,7 +366,7 @@ impl Mos6502 {
 
     fn fetch_byte(&mut self) -> Byte {
         let b: Byte = self.mem.get_byte(self.pc as usize);
-        self.decrement_program_counter(1);
+        self.increment_pc(1);
         self.cycle();
         b
     }
@@ -383,7 +378,7 @@ impl Mos6502 {
         let w2 = u16::from(self.mem.get_byte((self.pc + 1) as usize));
         self.cycle();
 
-        self.decrement_program_counter(2);
+        self.increment_pc(2);
         (w1 << 8) | w2
     }
 
@@ -391,16 +386,15 @@ impl Mos6502 {
 
     fn lda_set_status(&mut self) {
         if self.a == 0 {
-            Mos6502Flags::Z.set(self);
+            Mos6502Flags::Z.set(&mut self.status);
         } else {
-            Mos6502Flags::Z.clear(self);
+            Mos6502Flags::Z.clear(&mut self.status);
         }
         if self.a & (1u8 << 7) == 0 {
-            Mos6502Flags::N.clear(self);
+            Mos6502Flags::N.clear(&mut self.status);
         } else {
-            Mos6502Flags::N.set(self);
+            Mos6502Flags::N.set(&mut self.status);
         }
-        self.cycle();
     }
 
     ////////// CPU INSTRUCTION FUNCTIONS //////////
@@ -502,7 +496,7 @@ impl Mos6502 {
     }
 
     fn clc_imp(&mut self) {
-        Mos6502Flags::C.clear(self);
+        Mos6502Flags::C.clear(&mut self.status);
     }
 
     fn jmp_sr_abs(&mut self) {
@@ -542,7 +536,7 @@ impl Mos6502 {
     }
 
     fn sec_imp(&mut self) {
-        Mos6502Flags::C.set(self);
+        Mos6502Flags::C.set(&mut self.status);
     }
 
     fn rol_absx(&mut self) {
@@ -606,7 +600,7 @@ impl Mos6502 {
     }
 
     fn cli_imp(&mut self) {
-        Mos6502Flags::I.clear(self);
+        Mos6502Flags::I.clear(&mut self.status);
     }
 
     fn eor_absy(&mut self) {
@@ -682,7 +676,7 @@ impl Mos6502 {
     }
 
     fn sei_imp(&mut self) {
-        Mos6502Flags::I.set(self);
+        Mos6502Flags::I.set(&mut self.status);
     }
 
     fn adc_absy(&mut self) {
@@ -773,10 +767,6 @@ impl Mos6502 {
         todo!()
     }
 
-    fn lda_zpx_ind(&mut self) {
-        todo!()
-    }
-
     fn ldx_imm(&mut self) {
         todo!()
     }
@@ -785,10 +775,26 @@ impl Mos6502 {
         todo!()
     }
 
+    fn lda_imm(&mut self) {
+        self.a = self.fetch_byte();
+        self.lda_set_status();
+    }
+
+    fn lda_zpx_ind(&mut self) {
+        todo!()
+    }
+
     fn lda_zp(&mut self) {
         // TODO: address overflow.
         let zpaddr: Byte = self.fetch_byte();
-        self.a = self.read_byte(zpaddr);
+        self.a = self.read_byte_at_addr(zpaddr);
+        self.lda_set_status();
+    }
+
+    fn lda_zpx(&mut self) {
+        // TODO: address overflow.
+        let zpaddr: Byte = self.fetch_byte() + self.x;
+        self.a = self.read_byte_at_addr(zpaddr);
         self.lda_set_status();
     }
 
@@ -798,11 +804,6 @@ impl Mos6502 {
 
     fn tay_imp(&mut self) {
         todo!()
-    }
-
-    fn lda_imm(&mut self) {
-        self.a = self.fetch_byte();
-        self.lda_set_status();
     }
 
     fn tax_imp(&mut self) {
@@ -833,19 +834,12 @@ impl Mos6502 {
         todo!()
     }
 
-    fn lda_zpx(&mut self) {
-        // TODO: address overflow.
-        let zpaddr: Byte = self.fetch_byte() + self.x;
-        self.a = self.read_byte(zpaddr);
-        self.lda_set_status();
-    }
-
     fn ldx_zpy(&mut self) {
         todo!()
     }
 
     fn clv_imp(&mut self) {
-        Mos6502Flags::V.clear(self);
+        Mos6502Flags::V.clear(&mut self.status);
     }
 
     fn lda_absy(&mut self) {
@@ -929,7 +923,7 @@ impl Mos6502 {
     }
 
     fn cld_imp(&mut self) {
-        Mos6502Flags::D.clear(self);
+        Mos6502Flags::D.clear(&mut self.status);
     }
 
     fn cmp_absy(&mut self) {
@@ -1005,7 +999,7 @@ impl Mos6502 {
     }
 
     fn sed_imp(&mut self) {
-        Mos6502Flags::D.set(self);
+        Mos6502Flags::D.set(&mut self.status);
         self.cycle();
     }
 

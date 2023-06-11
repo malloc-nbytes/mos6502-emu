@@ -19,7 +19,6 @@ type Byte = u8;
 // Opcode:          $A9
 // Bytes:           2
 // Cycles:          2
-// Status:          DONE
 pub const LDA_IMM: Byte = 0xA9;
 pub const LDA_IMM_COST: u32 = 2;
 
@@ -48,7 +47,6 @@ pub const LDA_ABSY_CCOST: u32 = 4;
 // Opcode:          $A5
 // Bytes:           2
 // Cycles:          3
-// Status:          DONE
 pub const LDA_ZP: Byte = 0xA5;
 pub const LDA_ZP_CCOST: u32 = 3;
 
@@ -56,7 +54,6 @@ pub const LDA_ZP_CCOST: u32 = 3;
 // Opcode:          $B5
 // Bytes:           2
 // Cycles:          4
-// Status:          DONE
 pub const LDA_ZPX: Byte = 0xB5;
 pub const LDA_ZPX_CCOST: u32 = 4;
 
@@ -1219,7 +1216,6 @@ pub const BVS_REL_CCOST: u32 = 2;
 // Opcode:          $18
 // Bytes:           1
 // Cycles:          2
-// Status:          DONE
 pub const CLC_IMP: Byte = 0x18;
 pub const CLC_IMP_CCOST: u32 = 2;
 
@@ -1233,7 +1229,6 @@ pub const CLC_IMP_CCOST: u32 = 2;
 // Opcode:          $D8
 // Bytes:           1
 // Cycles:          2
-// Status:          DONE
 pub const CLD_IMP: Byte = 0xD8;
 pub const CLD_IMP_CCOST: u32 = 2;
 
@@ -1245,7 +1240,6 @@ pub const CLD_IMP_CCOST: u32 = 2;
 // Opcode:          $58
 // Bytes:           1
 // Cycles:          2
-// Status:          DONE
 pub const CLI_IMP: Byte = 0x58;
 pub const CLI_IMP_CCOST: u32 = 2;
 
@@ -1257,7 +1251,6 @@ pub const CLI_IMP_CCOST: u32 = 2;
 // Opcode:          $B8
 // Bytes:           1
 // Cycles:          2
-// Status:          DONE
 pub const CLV_IMP: Byte = 0xB8;
 pub const CLV_IMP_CCOST: u32 = 2;
 
@@ -1269,7 +1262,6 @@ pub const CLV_IMP_CCOST: u32 = 2;
 // Opcode:          $38
 // Bytes:           1
 // Cycles:          2
-// Status:          DONE
 pub const SEC_IMP: Byte = 0x38;
 pub const SEC_IMP_CCOST: u32 = 2;
 
@@ -1281,7 +1273,6 @@ pub const SEC_IMP_CCOST: u32 = 2;
 // Opcode:          $F8
 // Bytes:           1
 // Cycles:          2
-// Status:          DONE
 pub const SED_IMP: Byte = 0xF8;
 pub const SED_IMP_CCOST: u32 = 2;
 
@@ -1293,7 +1284,6 @@ pub const SED_IMP_CCOST: u32 = 2;
 // Opcode:          $78
 // Bytes:           1
 // Cycles:          2
-// Status:          DONE
 pub const SEI_IMP: Byte = 0x78;
 pub const SEI_IMP_CCOST: u32 = 2;
 
@@ -1305,6 +1295,5 @@ pub const SEI_IMP_CCOST: u32 = 2;
 // Opcode:          $EA
 // Bytes:           1
 // Cycles:          2
-// Status:          DONE
 pub const NOP_IMP: Byte = 0xEA;
 pub const NOP_IMP_CCOST: u32 = 2;
