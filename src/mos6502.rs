@@ -26,8 +26,7 @@ impl Mos6502Flags {
     }
 }
 
-const STACKPTR_BEGIN: Byte = 0xFF;
-const PROGRAM_COUNTER_BEGIN: Word = 0xFFFC;
+const STACKPTR_BEGIN: Byte = 0xFD;
 
 pub struct Mos6502 {
     a: Byte,
@@ -315,22 +314,31 @@ impl Mos6502 {
             a: 0x00, x: 0x00, y: 0x00,
             status: 0x00, cycles: c,
             sp: STACKPTR_BEGIN,
-            pc: PROGRAM_COUNTER_BEGIN,
+            pc: 0x0000,
             mem,
         }
     }
 
     pub fn reset(&mut self, cycles: Option<u32>) {
         (self.a, self.x, self.y, self.status) = (0x00, 0x00, 0x00, 0x00);
+
         self.cycles = match cycles { Some(c) => c, _ => 0 };
+
+        let lo: Byte = self.mem.get_byte(0xFFFC + 0);
+        let hi: Byte = self.mem.get_byte(0xFFFC + 1);
+
+        self.pc = ((hi as Word) << 8u8) | lo as Word;
         self.sp = STACKPTR_BEGIN;
-        self.pc = PROGRAM_COUNTER_BEGIN;
-        self.mem.clear();
+
+        self.status = 0x00 | Mos6502Flags::U as Byte;
+
+        // TODO: increment cycles by 8.
     }
 
     pub fn exe(&mut self) {
         while self.cycles > 0 {
             let opcode: Byte = self.fetch_byte();
+            println!("opcode: {opcode:x}");
             if let Some(instruction) = LOOKUP[opcode as usize] {
                 instruction(self);
             } else {
@@ -818,6 +826,7 @@ impl Mos6502 {
     }
 
     fn lda_imm(&mut self) {
+        println!("Here");
         self.a = self.fetch_byte();
         self.lda_set_status();
     }

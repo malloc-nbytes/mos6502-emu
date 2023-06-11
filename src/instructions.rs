@@ -20,7 +20,7 @@ type Byte = u8;
 // Bytes:           2
 // Cycles:          2
 pub const LDA_IMM: Byte = 0xA9;
-pub const LDA_IMM_COST: u32 = 2;
+pub const LDA_IMM_CCOST: u32 = 2;
 
 // Addressing Mode: Absolute
 // Opcode:          $AD
