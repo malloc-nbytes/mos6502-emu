@@ -19,12 +19,10 @@ fn cpu_mem_set(instrs: Vec<(u16, u8)>) -> mos6502::Mos6502 {
 #[allow(unused_variables)]
 fn main() {
     let mut cpu = cpu_mem_set(vec![
-        (0x0000, instructions::LDA_ZPX),
-        (0x0001, 0x42),
-        (0x0047, 0x80),
+        (0xFFFC, instructions::LDA_IMM),
+        (0xFFFD, 0x84),
     ]);
-    cpu.reset(instructions::LDA_ZPX_CCOST);
-    cpu.set_xreg(5);
-    cpu.exe();
+    cpu.reset();
+    cpu.exe(Some(instructions::LDA_IMM_CCOST));
     println!("{cpu}");
 }

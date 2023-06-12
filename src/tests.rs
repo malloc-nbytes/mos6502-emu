@@ -1,6 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use crate::mos6502::{Mos6502, Mos6502Flags};
+    use crate::mos6502::{
+        Mos6502,
+        Mos6502Flags,
+    };
     use crate::memory::Memory;
     use crate::instructions;
 
@@ -35,8 +38,8 @@ mod tests {
             (0xFFFC, instructions::LDA_IMM),
             (0xFFFD, 0x84),
         ]);
-        cpu.reset(instructions::LDA_IMM_CCOST);
-        cpu.exe();
+        cpu.reset();
+        cpu.exe(Some(instructions::LDA_IMM_CCOST));
         assert_eq!(cpu.get_accumulator(), 0x84);
         assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::N));
     }
@@ -48,8 +51,8 @@ mod tests {
             (0xFFFD, 0x42),
             (0x0042, 0x80),
         ]);
-        cpu.reset(instructions::LDA_ZP_CCOST);
-        cpu.exe();
+        cpu.reset();
+        cpu.exe(Some(instructions::LDA_ZP_CCOST));
         assert_eq!(cpu.get_accumulator(), 0x80);
         assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::N));
     }
@@ -61,9 +64,9 @@ mod tests {
             (0xFFFD, 0x42),
             (0x0047, 0x37),
         ]);
-        cpu.reset(instructions::LDA_ZPX_CCOST);
+        cpu.reset();
         cpu.set_xreg(5);
-        cpu.exe();
+        cpu.exe(Some(instructions::LDA_ZPX_CCOST));
         assert_eq!(cpu.get_accumulator(), 0x37);
         assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::N));
     }
@@ -75,9 +78,9 @@ mod tests {
             (0xFFFD, 0x80),
             (0x007F, 0x37),
         ]);
-        cpu.reset(instructions::LDA_ZPX_CCOST);
+        cpu.reset();
         cpu.set_xreg(0xFF);
-        cpu.exe();
+        cpu.exe(Some(instructions::LDA_ZPX_CCOST));
         assert_eq!(cpu.get_accumulator(), 0x37);
         assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::N));
     }
@@ -91,10 +94,8 @@ mod tests {
             (0x4242, instructions::LDA_IMM),
             (0x4243, 0x84),
         ]);
-        cpu.reset(
-            instructions::JSR_ABS_CCOST
-                + instructions::LDA_IMM_CCOST);
-        cpu.exe();
+        cpu.reset();
+        cpu.exe(Some(instructions::JSR_ABS_CCOST + instructions::LDA_IMM_CCOST));
         assert_eq!(cpu.get_accumulator(), 0x84);
         // Excluding negative flag because of the instruction
         // LDA_IMM being put into memory.

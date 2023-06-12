@@ -324,10 +324,10 @@ impl Mos6502 {
         }
     }
 
-    pub fn reset(&mut self, cycles: u32) {
+    pub fn reset(&mut self) {
         (self.a, self.x, self.y) = (0x00, 0x00, 0x00);
 
-        self.cycles = cycles;
+        self.cycles = 0;
 
         // let lo: Byte = self.mem.get_byte(0xFFFC + 0);
         // let hi: Byte = self.mem.get_byte(0xFFFC + 1);
@@ -342,8 +342,8 @@ impl Mos6502 {
         // TODO: increment cycles by 8.
     }
 
-    pub fn exe(&mut self) {
-        while self.cycles > 0 {
+    pub fn exe(&mut self, cycle_limit: Option<u32>) {
+        while match cycle_limit { Some(lim) => self.cycles < lim, _ => true } {
             let opcode: Byte = self.fetch_byte();
             if let Some(instruction) = LOOKUP[opcode as usize] {
                 instruction(self);
@@ -412,7 +412,7 @@ impl Mos6502 {
     ////////// HELPER FUNCTIONS //////////
 
     fn cycle(&mut self) {
-        self.cycles -= 1;
+        self.cycles += 1;
     }
 
     fn push_byte(&mut self, addr: usize, data: Byte) {
