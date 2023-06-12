@@ -44,7 +44,7 @@ mod tests {
         cpu.exe(Some(instructions::LDA_IMM_CCOST));
         assert_eq!(cpu.get_accumulator(), 0x32);
         assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::N));
-        assert_eq!(cpu.get_cycles(), instructions::LDA_IMM_CCOST);
+        assert_eq!(cpu.get_cycles(), instructions::LDA_IMM_CCOST); 
     }
 
     #[test]
@@ -57,6 +57,7 @@ mod tests {
         cpu.exe(Some(instructions::LDA_IMM_CCOST));
         assert_eq!(cpu.get_accumulator(), 0x00);
         assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::Z));
+        assert!(cpu.zero_flag());
         assert_eq!(cpu.get_cycles(), instructions::LDA_IMM_CCOST);
     }
 
@@ -71,6 +72,7 @@ mod tests {
         cpu.exe(Some(instructions::LDA_ZP_CCOST));
         assert_eq!(cpu.get_accumulator(), 0x80);
         assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::N));
+        assert!(cpu.negative_flag());
         assert_eq!(cpu.get_cycles(), instructions::LDA_ZP_CCOST);
     }
 
@@ -85,7 +87,7 @@ mod tests {
         cpu.set_xreg(5);
         cpu.exe(Some(instructions::LDA_ZPX_CCOST));
         assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::N));
+        assert_all_status_flags_false_except(&cpu, None);
         assert_eq!(cpu.get_cycles(), instructions::LDA_ZPX_CCOST);
     }
 
@@ -100,7 +102,7 @@ mod tests {
         cpu.set_xreg(0xFF);
         cpu.exe(Some(instructions::LDA_ZPX_CCOST));
         assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::N));
+        assert_all_status_flags_false_except(&cpu, None);
         assert_eq!(cpu.get_cycles(), instructions::LDA_ZPX_CCOST);
     }
 
@@ -121,6 +123,7 @@ mod tests {
         // Excluding negative flag because of the instruction
         // LDA_IMM being put into memory.
         assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::N));
+        assert!(cpu.negative_flag());
         assert_eq!(cpu.get_cycles(), instructions::JSR_ABS_CCOST + instructions::LDA_IMM_CCOST);
     }
 
@@ -147,6 +150,7 @@ mod tests {
         cpu.reset();
         cpu.exe(Some(instructions::SEC_IMP_CCOST));
         assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::C));
+        assert!(cpu.carry_flag());
         assert_eq!(cpu.get_cycles(), instructions::SEC_IMP_CCOST);
     }
 
@@ -160,6 +164,7 @@ mod tests {
         cpu.reset();
         cpu.exe(Some(instructions::SEI_IMP_CCOST));
         assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::I));
+        assert!(cpu.interrupts_disable_flag());
         assert_eq!(cpu.get_cycles(), instructions::SEI_IMP_CCOST);
     }
 
@@ -173,6 +178,7 @@ mod tests {
         cpu.reset();
         cpu.exe(Some(instructions::SED_IMP_CCOST));
         assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::D));
+        assert!(cpu.decimal_mode_flag());
         assert_eq!(cpu.get_cycles(), instructions::SED_IMP_CCOST);
     }
 
