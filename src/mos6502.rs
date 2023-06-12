@@ -18,7 +18,7 @@ pub enum Mos6502Flags {
 }
 
 impl Mos6502Flags {
-    pub fn set(self, status: &mut Byte) {
+    fn set(self, status: &mut Byte) {
         *status |= self as Byte;
     }
 
@@ -26,7 +26,7 @@ impl Mos6502Flags {
         *status &= !(self as Byte);
     }
 
-    fn get(self, status: Byte) -> bool {
+    pub fn get(self, status: Byte) -> bool {
         status & self as Byte != 0
     }
 }
@@ -51,6 +51,7 @@ impl std::fmt::Display for Mos6502 {
 
 const LOOKUP_TBL_SIZE: usize = 0x100;
 
+// (ﾉಥДಥ)ﾉ ︵┻━┻･/
 const LOOKUP: [Option<fn(&mut Mos6502)>; LOOKUP_TBL_SIZE] = [
     Some(Mos6502::brk_imp),
     Some(Mos6502::ora_zpx_ind),
@@ -318,8 +319,7 @@ impl Mos6502 {
         Self {
             a: 0x00, x: 0x00, y: 0x00,
             status: 0x00, cycles: 0,
-            sp: 0xFF,
-            pc: 0x0000,
+            sp: 0xFF, pc: 0x0000,
             mem,
         }
     }
@@ -327,7 +327,7 @@ impl Mos6502 {
     pub fn reset(&mut self) {
         (self.a, self.x, self.y) = (0x00, 0x00, 0x00);
 
-        self.cycles = 0;
+        // self.cycles = 0;
 
         // let lo: Byte = self.mem.get_byte(0xFFFC + 0);
         // let hi: Byte = self.mem.get_byte(0xFFFC + 1);
@@ -407,6 +407,14 @@ impl Mos6502 {
 
     pub fn get_cycles(&self) -> u32 {
         self.cycles
+    }
+
+    pub fn set_status_flag(&mut self, flag: Mos6502Flags) {
+        flag.set(&mut self.status);
+    }
+
+    pub fn clear_status_flag(&mut self, flag: Mos6502Flags) {
+        flag.clear(&mut self.status);
     }
 
     ////////// HELPER FUNCTIONS //////////
@@ -648,7 +656,7 @@ impl Mos6502 {
 
     fn sec_imp(&mut self) {
         Mos6502Flags::C.set(&mut self.status);
-        todo!("cycles");
+        self.cycle();
     }
 
     fn rol_absx(&mut self) {
@@ -713,7 +721,7 @@ impl Mos6502 {
 
     fn cli_imp(&mut self) {
         Mos6502Flags::I.clear(&mut self.status);
-        todo!("cycles");
+        self.cycle();
     }
 
     fn eor_absy(&mut self) {
@@ -790,7 +798,7 @@ impl Mos6502 {
 
     fn sei_imp(&mut self) {
         Mos6502Flags::I.set(&mut self.status);
-        todo!("cycles");
+        self.cycle();
     }
 
     fn adc_absy(&mut self) {
@@ -953,6 +961,7 @@ impl Mos6502 {
 
     fn clv_imp(&mut self) {
         Mos6502Flags::V.clear(&mut self.status);
+        self.cycle();
     }
 
     fn lda_absy(&mut self) {
@@ -1037,6 +1046,7 @@ impl Mos6502 {
 
     fn cld_imp(&mut self) {
         Mos6502Flags::D.clear(&mut self.status);
+        self.cycle();
     }
 
     fn cmp_absy(&mut self) {
