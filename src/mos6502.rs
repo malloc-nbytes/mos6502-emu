@@ -409,6 +409,8 @@ impl Mos6502 {
         self.cycles
     }
 
+    ////////// HELPER FUNCTIONS //////////
+
     fn cycle(&mut self) {
         self.cycles -= 1;
     }
@@ -423,7 +425,7 @@ impl Mos6502 {
         self.mem.write_word(addr, data);
         self.cycle();
         self.cycle();
-        self.sp -= 1;
+        self.sp -= 2;
     }
 
     fn pop(&mut self) {
@@ -457,8 +459,6 @@ impl Mos6502 {
         *target = wrapped_sum as Byte;
         self.cycle();
     }
-
-    ////////// HELPER FUNCTIONS //////////
 
     fn program_counter(&mut self) {
         self.pc += 1;
