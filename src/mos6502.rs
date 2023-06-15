@@ -389,6 +389,14 @@ impl Mos6502 {
         self.x = data;
     }
 
+    pub fn set_yreg(&mut self, data: Byte) {
+        self.y = data;
+    }
+
+    pub fn set_accumulator(&mut self, data: Byte) {
+        self.a = data;
+    }
+
     pub fn get_accumulator(&self) -> Byte {
         self.a
     }
@@ -462,7 +470,7 @@ impl Mos6502 {
     }
 
     fn add_offset_wcycle(&mut self, target: &mut Byte, offset: Byte) {
-        let sum = *target as u16 + offset as u16;
+        let sum = u16::from(*target) + u16::from(offset);
         let wrapped_sum = sum % 256;
         *target = wrapped_sum as Byte;
         self.cycle();

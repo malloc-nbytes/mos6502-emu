@@ -106,6 +106,124 @@ mod tests {
         assert_eq!(cpu.get_cycles(), instructions::LDA_ZPX_CCOST);
     }
 
+    #[test]
+    fn lda_abs() {
+        assert!(false);
+    }
+
+    #[test]
+    fn lda_imm_zero_flag() {
+        let mut cpu = cpu_mem_set(vec![
+            (0xFFFC, instructions::LDA_IMM),
+            (0xFFFD, 0x00),
+        ]);
+
+        cpu.reset();
+        cpu.set_accumulator(0x44);
+        cpu.exe(Some(instructions::LDA_IMM_CCOST));
+
+        assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::Z));
+        assert!(cpu.zero_flag());
+        assert_eq!(cpu.get_cycles(), instructions::LDA_IMM_CCOST); 
+        assert_eq!(cpu.get_accumulator(), 0x00);
+    }
+
+    #[test]
+    fn lda_absx_page_crossed() {
+        let mut cpu = cpu_mem_set(vec![
+            (0xFFFC, instructions::LDA_ABSX),
+            (0xFFFD, 0x02),
+            (0xFFFE, 0x44), // 0x4402
+            (0x4501, 0x37), // 0x4402 + 0xFF crosses page boundary.
+        ]);
+
+        cpu.reset();
+        cpu.set_xreg(0xFF);
+        cpu.exe(Some(instructions::LDA_ABSX_CCOST));
+
+        assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::Z));
+        assert!(cpu.zero_flag());
+        assert_eq!(cpu.get_cycles(), instructions::LDA_ABSX_CCOST + 1);
+        assert_eq!(cpu.get_accumulator(), 0x00);
+    }
+
+    #[test]
+    fn lda_absx_no_page_crossed() {
+        let mut cpu = cpu_mem_set(vec![
+            (0xFFFC, instructions::LDA_ABSX),
+            (0xFFFD, 0x80),
+            (0xFFFE, 0x44), // 0x4480
+            (0x4481, 0x37),
+        ]);
+
+        cpu.reset();
+        cpu.set_xreg(1u8);
+        cpu.exe(Some(instructions::LDA_ABSX_CCOST));
+
+        assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::Z));
+        assert!(cpu.zero_flag());
+        assert_eq!(cpu.get_cycles(), instructions::LDA_ABSX_CCOST); 
+        assert_eq!(cpu.get_accumulator(), 0x00);
+    }
+
+    #[test]
+    fn lda_absy_page_crossed() {
+        let mut cpu = cpu_mem_set(vec![
+            (0xFFFC, instructions::LDA_ABSY),
+            (0xFFFD, 0x02),
+            (0xFFFE, 0x44), // 0x4402
+            (0x4501, 0x37), // 0x4402 + 0xFF crosses page boundary.
+        ]);
+
+        cpu.reset();
+        cpu.set_yreg(0xFF);
+        cpu.exe(Some(instructions::LDA_ABSY_CCOST));
+
+        assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::Z));
+        assert!(cpu.zero_flag());
+        assert_eq!(cpu.get_cycles(), instructions::LDA_ABSY_CCOST + 1); 
+        assert_eq!(cpu.get_accumulator(), 0x00);
+    }
+
+    #[test]
+    fn lda_absy_no_page_crossed() {
+        let mut cpu = cpu_mem_set(vec![
+            (0xFFFC, instructions::LDA_ABSY),
+            (0xFFFD, 0x80),
+            (0xFFFE, 0x44), // 0x4480
+            (0x4481, 0x37),
+        ]);
+
+        cpu.reset();
+        cpu.set_yreg(1u8);
+        cpu.exe(Some(instructions::LDA_ABSY_CCOST));
+
+        assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::Z));
+        assert!(cpu.zero_flag());
+        assert_eq!(cpu.get_cycles(), instructions::LDA_ABSY_CCOST); 
+        assert_eq!(cpu.get_accumulator(), 0x00);
+    }
+
+    #[test]
+    fn lda_zpx_ind() {
+        let mut cpu = cpu_mem_set(vec![
+            (0xFFFC, instructions::LDA_ZPX_IND),
+            (0xFFFD, 0x02),
+            (0x0006, 0x00), // 0x02 + 0x04 (xreg) = 0x0006
+            (0x0007, 0x80),
+            (0x8000, 0x37),
+        ]);
+        cpu.reset();
+        cpu.set_xreg(0x04);
+        cpu.exe(Some(instructions::LDA_ZPX_IND_CCOST));
+
+        // assert_all_status_flags_false_except(&cpu, Some(Mos6502Flags::Z));
+        assert!(!cpu.zero_flag());
+        assert!(!cpu.negative_flag());
+        assert_eq!(cpu.get_cycles(), instructions::LDA_ZPX_IND_CCOST); 
+        assert_eq!(cpu.get_accumulator(), 0x37);
+    }
+
     ////////// JSR //////////
 
     #[test]
