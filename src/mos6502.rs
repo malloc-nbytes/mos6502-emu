@@ -38,7 +38,7 @@ pub struct Mos6502 {
     status: Byte,
     sp: Byte,
     pc: Word,
-    mem: Memory,
+    pub mem: Memory,
     cycles: u32,
 }
 
@@ -480,8 +480,17 @@ impl Mos6502 {
         self.pc += 1;
     }
 
-    fn read_byte_at_addr(&mut self, addr: Byte) -> Byte {
-        // NOTE: This function is needed to retrieve a byte
+    // fn read_byte_at_zp(&mut self, zp_addr: Byte) -> Byte {
+    //     // NOTE: This function is needed to retrieve a byte
+    //     // and not increment the program counter.
+    //     // NOTE: We are reading only a byte instead of a word
+    //     // because of the zero page.
+    //     self.cycle();
+    //     self.mem.get_byte(zp_addr as usize)
+    // }
+
+    fn read_byte_at_addr(&mut self, addr: Word) -> Byte {
+        // NOTE: This function is needed to retrieve a word
         // and not increment the program counter.
         self.cycle();
         self.mem.get_byte(addr as usize)
@@ -503,7 +512,7 @@ impl Mos6502 {
         self.program_counter();
         self.cycle();
 
-        (w1 << 8) | w2
+        (w2 << 8) | w1
     }
 
     ////////// SET STATUS FUNCTIONS //////////
@@ -916,14 +925,14 @@ impl Mos6502 {
 
     fn lda_zp(&mut self) {
         let zpaddr: Byte = self.fetch_byte();
-        self.a = self.read_byte_at_addr(zpaddr);
+        self.a = self.read_byte_at_addr(zpaddr.into());
         self.lda_set_status();
     }
 
     fn lda_zpx(&mut self) {
         let mut zpaddr: Byte = self.fetch_byte();
         self.add_offset_wcycle(&mut zpaddr, self.x);
-        self.a = self.read_byte_at_addr(zpaddr);
+        self.a = self.read_byte_at_addr(zpaddr.into());
         self.lda_set_status();
     }
 
@@ -944,7 +953,9 @@ impl Mos6502 {
     }
 
     fn lda_abs(&mut self) {
-        todo!()
+        let abs_addr: Word = self.fetch_word();
+        self.a = self.read_byte_at_addr(abs_addr);
+        self.lda_set_status();
     }
 
     fn ldx_abs(&mut self) {

@@ -34,5 +34,13 @@ impl Memory {
         self.data[(addr + 1) % self.data.len()] = (data >> 8) as Byte;
     }
 
+    pub fn print_written_mem(&self) {
+        (0..MEM_MAX).for_each(|i| {
+            if self.data[i] != 0x00 {
+                println!("addr: {:x}, {:x}", i, self.data[i]);
+            }
+        });
+    }
+
 }
 
