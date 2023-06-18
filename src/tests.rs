@@ -13,7 +13,7 @@ mod tests {
             *mem.at(addr as usize) = opcode;
         }
         let mut cpu = Mos6502::new(mem);
-        cpu.reset();
+        cpu.reset(false);
         cpu
     }
 

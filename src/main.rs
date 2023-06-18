@@ -12,7 +12,7 @@ fn cpu_mem_set(instrs: Vec<(u16, u8)>) -> mos6502::Mos6502 {
         *mem.at(addr as usize) = opcode;
     }
     let mut cpu = mos6502::Mos6502::new(mem);
-    cpu.reset();
+    cpu.reset(false);
     cpu
 }
 
@@ -20,14 +20,13 @@ fn cpu_mem_set(instrs: Vec<(u16, u8)>) -> mos6502::Mos6502 {
 #[allow(unused_mut)]
 #[allow(unused_variables)]
 fn main() {
-    let mut cpu = cpu_mem_set(vec![
-        (0xFFFC, instructions::JSR_ABS),
-        (0xFFFD, 0x42),
-        (0xFFFE, 0x42),
-        (0x4242, instructions::LDA_IMM),
-        (0x4243, 0x84),
-    ]);
+    for _ in 0..10 {
+        let mut cpu = cpu_mem_set(vec![
+            (0xFFFC, instructions::LDA_IMM),
+            (0xFFFD, 0x84),
+        ]);
+        cpu.exe(Some(instructions::JSR_ABS_CCOST + instructions::LDA_IMM_CCOST));
+    }
 
-    cpu.exe(Some(instructions::JSR_ABS_CCOST + instructions::LDA_IMM_CCOST));
-    println!("{cpu}");
+    // println!("{cpu}");
 }

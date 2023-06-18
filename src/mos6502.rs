@@ -324,18 +324,18 @@ impl Mos6502 {
         }
     }
 
-    pub fn reset(&mut self) {
+    pub fn reset(&mut self, reset_vector: bool) {
         (self.a, self.x, self.y) = (0x00, 0x00, 0x00);
 
-        // self.cycles = 0;
+        if reset_vector {
+            let lo: Byte = self.mem.get_byte(0xFFFC);
+            let hi: Byte = self.mem.get_byte(0xFFFC + 1);
+            self.pc = (Word::from(hi) << 8u8) | Word::from(lo);
+        } else {
+            self.pc = 0xFFFC;
+        }
 
-        // let lo: Byte = self.mem.get_byte(0xFFFC + 0);
-        // let hi: Byte = self.mem.get_byte(0xFFFC + 1);
-        // self.pc = ((hi as Word) << 8u8) | lo as Word;
-        // self.status = 0x00 | Mos6502Flags::U as Byte;
-
-        self.pc = 0xFFFC;
-        self.sp = 0xFF;
+        self.sp = 0xFD;
 
         self.status = 0x00;
 
@@ -475,9 +475,20 @@ impl Mos6502 {
         self.cycle();
     }
 
+    fn offset_byte_wocycle(&mut self, target: &mut Byte, offset: Byte) {
+        let sum = u16::from(*target) + u16::from(offset);
+        *target = (sum % 256) as Byte;
+    }
+
     fn offset_word_wocycle(&mut self, target: &mut Word, offset: Byte) {
         let sum = u16::from(*target) + u16::from(offset);
         *target = sum % Word::MAX;
+    }
+
+    fn offset_word_wcycle(&mut self, target: &mut Word, offset: Byte) {
+        let sum = u16::from(*target) + u16::from(offset);
+        *target = sum % Word::MAX;
+        self.cycle();
     }
 
     fn program_counter(&mut self) {
@@ -513,6 +524,12 @@ impl Mos6502 {
         self.cycle();
 
         (w2 << 8) | w1
+    }
+
+    fn read_word_at_addr(&mut self, addr: Word) -> Word {
+        let lo = Word::from(self.read_byte_at_addr(addr));
+        let hi = Word::from(self.read_byte_at_addr((addr + 1) % 256));
+        (hi << 8) | lo
     }
 
     ////////// SET STATUS FUNCTIONS //////////
@@ -635,8 +652,11 @@ impl Mos6502 {
 
     fn jsr_abs(&mut self) {
         let addr = self.fetch_word();
-        println!("pc: {}", self.pc);
-        // self.push_word(usize::from(self.pc), self.pc - 1);
+        if self.pc == 0x00 {
+            self.push_word(usize::from(self.pc), Word::MAX);
+        } else {
+            self.push_word(usize::from(self.pc), self.pc - 1);
+        }
         self.pc_assign_wcycle(addr);
     }
 
@@ -921,12 +941,16 @@ impl Mos6502 {
     }
 
     fn lda_zpx_ind(&mut self) {
-        todo!()
+        let mut zpaddr: Byte = self.fetch_next_byte();
+        self.offset_byte_wcycle(&mut zpaddr, self.x);
+        let reladdr: Word = self.read_word_at_addr(Word::from(zpaddr));
+        self.a = self.read_byte_at_addr(reladdr);
+        self.lda_set_status();
     }
 
     fn lda_zp(&mut self) {
         let zpaddr: Byte = self.fetch_next_byte();
-        self.a = self.read_byte_at_addr(zpaddr.into());
+        self.a = self.read_byte_at_addr(Word::from(zpaddr));
         self.lda_set_status();
     }
 
@@ -935,6 +959,50 @@ impl Mos6502 {
         self.offset_byte_wcycle(&mut zpaddr, self.x);
         self.a = self.read_byte_at_addr(zpaddr.into());
         self.lda_set_status();
+    }
+
+    fn lda_absy(&mut self) {
+        let mut abs_addr: Word = self.fetch_word();
+
+        self.offset_word_wocycle(&mut abs_addr, self.y);
+        self.a = self.read_byte_at_addr(abs_addr);
+
+        if (abs_addr % 256) + Word::from(self.y) > 0xFE {
+            self.cycle();
+        }
+
+        self.lda_set_status();
+    }
+
+    fn lda_absx(&mut self) {
+        let mut abs_addr: Word = self.fetch_word();
+
+        self.offset_word_wocycle(&mut abs_addr, self.x);
+        self.a = self.read_byte_at_addr(abs_addr);
+
+        if (abs_addr % 256) + Word::from(self.x) > 0xFE {
+            self.cycle();
+        }
+
+        self.lda_set_status();
+    }
+
+    fn lda_abs(&mut self) {
+        let abs_addr: Word = self.fetch_word();
+        self.a = self.read_byte_at_addr(abs_addr);
+        self.lda_set_status();
+    }
+
+    fn lda_zpy_ind(&mut self) {
+        let zpaddr: Byte = self.fetch_next_byte();
+        let mut reladdr: Word = self.read_word_at_addr(Word::from(zpaddr));
+
+        self.offset_word_wocycle(&mut reladdr, self.y);
+        self.a = self.read_byte_at_addr(reladdr);
+
+        if (reladdr % 256) + Word::from(self.y) > 0xFE {
+            self.cycle();
+        }
     }
 
     fn ldx_zp(&mut self) {
@@ -953,21 +1021,11 @@ impl Mos6502 {
         todo!()
     }
 
-    fn lda_abs(&mut self) {
-        let abs_addr: Word = self.fetch_word();
-        self.a = self.read_byte_at_addr(abs_addr);
-        self.lda_set_status();
-    }
-
     fn ldx_abs(&mut self) {
         todo!()
     }
 
     fn bcs_rel(&mut self) {
-        todo!()
-    }
-
-    fn lda_zpy_ind(&mut self) {
         todo!()
     }
 
@@ -984,30 +1042,12 @@ impl Mos6502 {
         self.cycle();
     }
 
-    fn lda_absy(&mut self) {
-        todo!()
-    }
-
     fn tsx_imp(&mut self) {
         todo!()
     }
 
     fn ldy_absx(&mut self) {
         todo!()
-    }
-
-    fn lda_absx(&mut self) {
-        let mut abs_addr: Word = self.fetch_word();
-        let addr_copy = abs_addr;
-
-        self.offset_word_wocycle(&mut abs_addr, self.x);
-        self.a = self.read_byte_at_addr(abs_addr);
-
-        if abs_addr - addr_copy >= 0xFF {
-            self.cycle();
-        }
-
-        self.lda_set_status();
     }
 
     fn ldx_absy(&mut self) {
