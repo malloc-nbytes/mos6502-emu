@@ -1003,6 +1003,8 @@ impl Mos6502 {
         if (reladdr % 256) + Word::from(self.y) > 0xFE {
             self.cycle();
         }
+
+        self.lda_set_status();
     }
 
     fn ldx_zp(&mut self) {
