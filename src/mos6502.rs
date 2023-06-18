@@ -549,6 +549,80 @@ impl Mos6502 {
 
     ////////// CPU INSTRUCTION FUNCTIONS //////////
 
+    ///// LDA /////
+
+    fn lda_imm(&mut self) {
+        self.a = self.fetch_next_byte();
+        self.lda_set_status();
+    }
+
+    fn lda_zpx_ind(&mut self) {
+        let mut zpaddr: Byte = self.fetch_next_byte();
+        self.offset_byte_wcycle(&mut zpaddr, self.x);
+        let reladdr: Word = self.read_word_at_addr(Word::from(zpaddr));
+        self.a = self.read_byte_at_addr(reladdr);
+        self.lda_set_status();
+    }
+
+    fn lda_zp(&mut self) {
+        let zpaddr: Byte = self.fetch_next_byte();
+        self.a = self.read_byte_at_addr(Word::from(zpaddr));
+        self.lda_set_status();
+    }
+
+    fn lda_zpx(&mut self) {
+        let mut zpaddr: Byte = self.fetch_next_byte();
+        self.offset_byte_wcycle(&mut zpaddr, self.x);
+        self.a = self.read_byte_at_addr(zpaddr.into());
+        self.lda_set_status();
+    }
+
+    fn lda_absy(&mut self) {
+        let mut abs_addr: Word = self.fetch_word();
+
+        self.offset_word_wocycle(&mut abs_addr, self.y);
+        self.a = self.read_byte_at_addr(abs_addr);
+
+        if (abs_addr % 256) + Word::from(self.y) > 0xFE {
+            self.cycle();
+        }
+
+        self.lda_set_status();
+    }
+
+    fn lda_absx(&mut self) {
+        let mut abs_addr: Word = self.fetch_word();
+
+        self.offset_word_wocycle(&mut abs_addr, self.x);
+        self.a = self.read_byte_at_addr(abs_addr);
+
+        if (abs_addr % 256) + Word::from(self.x) > 0xFE {
+            self.cycle();
+        }
+
+        self.lda_set_status();
+    }
+
+    fn lda_abs(&mut self) {
+        let abs_addr: Word = self.fetch_word();
+        self.a = self.read_byte_at_addr(abs_addr);
+        self.lda_set_status();
+    }
+
+    fn lda_zpy_ind(&mut self) {
+        let zpaddr: Byte = self.fetch_next_byte();
+        let mut reladdr: Word = self.read_word_at_addr(Word::from(zpaddr));
+
+        self.offset_word_wocycle(&mut reladdr, self.y);
+        self.a = self.read_byte_at_addr(reladdr);
+
+        if (reladdr % 256) + Word::from(self.y) > 0xFE {
+            self.cycle();
+        }
+
+        self.lda_set_status();
+    }
+
     fn asl_zp(&mut self) {
         todo!()
     }
@@ -933,78 +1007,6 @@ impl Mos6502 {
 
     fn ldy_zp(&mut self) {
         todo!()
-    }
-
-    fn lda_imm(&mut self) {
-        self.a = self.fetch_next_byte();
-        self.lda_set_status();
-    }
-
-    fn lda_zpx_ind(&mut self) {
-        let mut zpaddr: Byte = self.fetch_next_byte();
-        self.offset_byte_wcycle(&mut zpaddr, self.x);
-        let reladdr: Word = self.read_word_at_addr(Word::from(zpaddr));
-        self.a = self.read_byte_at_addr(reladdr);
-        self.lda_set_status();
-    }
-
-    fn lda_zp(&mut self) {
-        let zpaddr: Byte = self.fetch_next_byte();
-        self.a = self.read_byte_at_addr(Word::from(zpaddr));
-        self.lda_set_status();
-    }
-
-    fn lda_zpx(&mut self) {
-        let mut zpaddr: Byte = self.fetch_next_byte();
-        self.offset_byte_wcycle(&mut zpaddr, self.x);
-        self.a = self.read_byte_at_addr(zpaddr.into());
-        self.lda_set_status();
-    }
-
-    fn lda_absy(&mut self) {
-        let mut abs_addr: Word = self.fetch_word();
-
-        self.offset_word_wocycle(&mut abs_addr, self.y);
-        self.a = self.read_byte_at_addr(abs_addr);
-
-        if (abs_addr % 256) + Word::from(self.y) > 0xFE {
-            self.cycle();
-        }
-
-        self.lda_set_status();
-    }
-
-    fn lda_absx(&mut self) {
-        let mut abs_addr: Word = self.fetch_word();
-
-        self.offset_word_wocycle(&mut abs_addr, self.x);
-        self.a = self.read_byte_at_addr(abs_addr);
-
-        if (abs_addr % 256) + Word::from(self.x) > 0xFE {
-            self.cycle();
-        }
-
-        self.lda_set_status();
-    }
-
-    fn lda_abs(&mut self) {
-        let abs_addr: Word = self.fetch_word();
-        self.a = self.read_byte_at_addr(abs_addr);
-        self.lda_set_status();
-    }
-
-    fn lda_zpy_ind(&mut self) {
-        let zpaddr: Byte = self.fetch_next_byte();
-        let mut reladdr: Word = self.read_word_at_addr(Word::from(zpaddr));
-
-        self.offset_word_wocycle(&mut reladdr, self.y);
-        self.a = self.read_byte_at_addr(reladdr);
-
-        if (reladdr % 256) + Word::from(self.y) > 0xFE {
-            self.cycle();
-        }
-
-        self.lda_set_status();
     }
 
     fn ldx_zp(&mut self) {
