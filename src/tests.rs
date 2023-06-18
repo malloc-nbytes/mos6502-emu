@@ -37,17 +37,6 @@ mod tests {
     ////////// LDA //////////
 
     #[test]
-    fn illegal_opcode_wcycles() {
-        let mut cpu = cpu_mem_set(vec![
-            (0xFFFC, 0x02),
-            (0xFFFD, 0x02),
-        ]);
-
-        cpu.exe(Some(instructions::LDA_IMM_CCOST));
-        assert_eq!(cpu.get_cycles(), instructions::LDA_IMM_CCOST);
-    }
-
-    #[test]
     fn lda_imm() {
         let mut cpu = cpu_mem_set(vec![
             (0xFFFC, instructions::LDA_IMM),

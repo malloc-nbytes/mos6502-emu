@@ -344,11 +344,11 @@ impl Mos6502 {
 
     pub fn exe(&mut self, cycle_limit: Option<u32>) {
         while match cycle_limit { Some(lim) => self.cycles < lim, _ => true } {
-            let opcode: Byte = self.fetch_byte();
+            let opcode: Byte = self.fetch_next_byte();
             if let Some(instruction) = LOOKUP[opcode as usize] {
                 instruction(self);
             } else {
-                println!("Illegal opcode: {opcode}");
+                panic!("Illegal opcode: {opcode}");
             }
         }
     }
@@ -469,34 +469,34 @@ impl Mos6502 {
         self.cycle();
     }
 
-    fn add_offset_wcycle(&mut self, target: &mut Byte, offset: Byte) {
+    fn offset_byte_wcycle(&mut self, target: &mut Byte, offset: Byte) {
         let sum = u16::from(*target) + u16::from(offset);
-        let wrapped_sum = sum % 256;
-        *target = wrapped_sum as Byte;
+        *target = (sum % 256) as Byte;
         self.cycle();
+    }
+
+    fn offset_word_wocycle(&mut self, target: &mut Word, offset: Byte) {
+        let sum = u16::from(*target) + u16::from(offset);
+        *target = sum % Word::MAX;
     }
 
     fn program_counter(&mut self) {
         self.pc += 1;
+        self.pc %= Word::MAX;
     }
-
-    // fn read_byte_at_zp(&mut self, zp_addr: Byte) -> Byte {
-    //     // NOTE: This function is needed to retrieve a byte
-    //     // and not increment the program counter.
-    //     // NOTE: We are reading only a byte instead of a word
-    //     // because of the zero page.
-    //     self.cycle();
-    //     self.mem.get_byte(zp_addr as usize)
-    // }
 
     fn read_byte_at_addr(&mut self, addr: Word) -> Byte {
         // NOTE: This function is needed to retrieve a word
         // and not increment the program counter.
+        // NOTE: When dealing with zero page, this function
+        // is still being used even though the address is
+        // a `Word` and zero page address is a `Byte`. It
+        // will just cast to a `Word`.
         self.cycle();
         self.mem.get_byte(addr as usize)
     }
 
-    fn fetch_byte(&mut self) -> Byte {
+    fn fetch_next_byte(&mut self) -> Byte {
         let b: Byte = self.mem.get_byte(self.pc as usize);
         self.program_counter();
         self.cycle();
@@ -635,7 +635,8 @@ impl Mos6502 {
 
     fn jsr_abs(&mut self) {
         let addr = self.fetch_word();
-        self.push_word(self.pc as usize, self.pc - 1);
+        println!("pc: {}", self.pc);
+        // self.push_word(usize::from(self.pc), self.pc - 1);
         self.pc_assign_wcycle(addr);
     }
 
@@ -915,7 +916,7 @@ impl Mos6502 {
     }
 
     fn lda_imm(&mut self) {
-        self.a = self.fetch_byte();
+        self.a = self.fetch_next_byte();
         self.lda_set_status();
     }
 
@@ -924,14 +925,14 @@ impl Mos6502 {
     }
 
     fn lda_zp(&mut self) {
-        let zpaddr: Byte = self.fetch_byte();
+        let zpaddr: Byte = self.fetch_next_byte();
         self.a = self.read_byte_at_addr(zpaddr.into());
         self.lda_set_status();
     }
 
     fn lda_zpx(&mut self) {
-        let mut zpaddr: Byte = self.fetch_byte();
-        self.add_offset_wcycle(&mut zpaddr, self.x);
+        let mut zpaddr: Byte = self.fetch_next_byte();
+        self.offset_byte_wcycle(&mut zpaddr, self.x);
         self.a = self.read_byte_at_addr(zpaddr.into());
         self.lda_set_status();
     }
@@ -996,7 +997,17 @@ impl Mos6502 {
     }
 
     fn lda_absx(&mut self) {
-        todo!()
+        let mut abs_addr: Word = self.fetch_word();
+        let addr_copy = abs_addr;
+
+        self.offset_word_wocycle(&mut abs_addr, self.x);
+        self.a = self.read_byte_at_addr(abs_addr);
+
+        if abs_addr - addr_copy >= 0xFF {
+            self.cycle();
+        }
+
+        self.lda_set_status();
     }
 
     fn ldx_absy(&mut self) {
