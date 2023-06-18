@@ -1,8 +1,12 @@
 #![allow(dead_code)]
 
 // Reference(s):
-//  https://www.pagetable.com/c64ref/6502/?tab=2
-//  https://www.masswerk.at/6502/6502_instruction_set.html
+//  Main:
+//    https://www.pagetable.com/c64ref/6502/?tab=2
+//  Other Descriptions:
+//    https://www.nesdev.org/obelisk-6502-guide/reference.html
+//  Other:
+//    https://www.masswerk.at/6502/6502_instruction_set.html
 
 // (ﾉಥДಥ)ﾉ ︵┻━┻･/
 

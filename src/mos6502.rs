@@ -547,6 +547,19 @@ impl Mos6502 {
         }
     }
 
+    fn ldx_set_status() {
+        if self.x == 0 {
+            Mos6502Flags::Z.set(&mut self.status);
+        } else {
+            Mos6502Flags::Z.clear(&mut self.status);
+        }
+        if self.x & (1u8 << 7) == 0 {
+            Mos6502Flags::N.clear(&mut self.status);
+        } else {
+            Mos6502Flags::N.set(&mut self.status);
+        }
+    }
+
     ////////// CPU INSTRUCTION FUNCTIONS //////////
 
     ///// LDA /////

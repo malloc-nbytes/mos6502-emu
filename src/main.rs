@@ -25,7 +25,7 @@ fn main() {
             (0xFFFC, instructions::LDA_IMM),
             (0xFFFD, 0x84),
         ]);
-        cpu.exe(Some(instructions::JSR_ABS_CCOST + instructions::LDA_IMM_CCOST));
+        cpu.exe(Some(instructions::LDA_IMM_CCOST));
     }
 
     // println!("{cpu}");
