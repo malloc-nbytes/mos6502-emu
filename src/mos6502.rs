@@ -560,6 +560,19 @@ impl Mos6502 {
         }
     }
 
+    fn ldy_set_status() {
+        if self.y == 0 {
+            Mos6502Flags::Z.set(&mut self.status);
+        } else {
+            Mos6502Flags::Z.clear(&mut self.status);
+        }
+        if self.y & (1u8 << 7) == 0 {
+            Mos6502Flags::N.clear(&mut self.status);
+        } else {
+            Mos6502Flags::N.set(&mut self.status);
+        }
+    }
+
     ////////// CPU INSTRUCTION FUNCTIONS //////////
 
     ///// LDA /////
@@ -634,6 +647,50 @@ impl Mos6502 {
         }
 
         self.lda_set_status();
+    }
+
+    ///// LDX /////
+
+    fn ldx_imm(&mut self) {
+        todo!()
+    }
+
+    fn ldx_zp(&mut self) {
+        todo!()
+    }
+
+    fn ldx_abs(&mut self) {
+        todo!()
+    }
+
+    fn ldx_zpy(&mut self) {
+        todo!()
+    }
+
+    fn ldx_absy(&mut self) {
+        todo!()
+    }
+
+    ///// LDY /////
+
+    fn ldy_imm(&mut self) {
+        todo!()
+    }
+
+    fn ldy_zp(&mut self) {
+        todo!()
+    }
+
+    fn ldy_abs(&mut self) {
+        todo!()
+    }
+
+    fn ldy_zpx(&mut self) {
+        todo!()
+    }
+
+    fn ldy_absx(&mut self) {
+        todo!()
     }
 
     fn asl_zp(&mut self) {
@@ -1010,22 +1067,6 @@ impl Mos6502 {
         todo!()
     }
 
-    fn ldy_imm(&mut self) {
-        todo!()
-    }
-
-    fn ldx_imm(&mut self) {
-        todo!()
-    }
-
-    fn ldy_zp(&mut self) {
-        todo!()
-    }
-
-    fn ldx_zp(&mut self) {
-        todo!()
-    }
-
     fn tay_imp(&mut self) {
         todo!()
     }
@@ -1034,23 +1075,7 @@ impl Mos6502 {
         todo!()
     }
 
-    fn ldy_abs(&mut self) {
-        todo!()
-    }
-
-    fn ldx_abs(&mut self) {
-        todo!()
-    }
-
     fn bcs_rel(&mut self) {
-        todo!()
-    }
-
-    fn ldy_zpx(&mut self) {
-        todo!()
-    }
-
-    fn ldx_zpy(&mut self) {
         todo!()
     }
 
@@ -1060,14 +1085,6 @@ impl Mos6502 {
     }
 
     fn tsx_imp(&mut self) {
-        todo!()
-    }
-
-    fn ldy_absx(&mut self) {
-        todo!()
-    }
-
-    fn ldx_absy(&mut self) {
         todo!()
     }
 
