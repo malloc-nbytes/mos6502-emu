@@ -317,9 +317,13 @@ impl Mos6502 {
 
     pub fn new(mem: Memory) -> Self {
         Self {
-            a: 0x00, x: 0x00, y: 0x00,
-            status: 0x00, cycles: 0,
-            sp: 0xFF, pc: 0x0000,
+            a: 0x00,
+            x: 0x00,
+            y: 0x00,
+            status: 0x00,
+            cycles: 0,
+            sp: 0x00,
+            pc: 0x0000,
             mem,
         }
     }
@@ -492,19 +496,18 @@ impl Mos6502 {
     }
 
     fn program_counter(&mut self) {
-        self.pc += 1;
-        self.pc %= Word::MAX;
+        self.pc = (self.pc + 1) % Word::MAX;
     }
 
     fn read_byte_at_addr(&mut self, addr: Word) -> Byte {
-        // NOTE: This function is needed to retrieve a word
+        // NOTE: This function is needed to retrieve a byte
         // and not increment the program counter.
         // NOTE: When dealing with zero page, this function
         // is still being used even though the address is
-        // a `Word` and zero page address is a `Byte`. It
-        // will just cast to a `Word`.
+        // a `Word` and zero page address is a `Byte`. Just
+        // cast to a `Word`.
         self.cycle();
-        self.mem.get_byte(addr as usize)
+        self.mem.get_byte(usize::from(addr))
     }
 
     fn fetch_next_byte(&mut self) -> Byte {
@@ -515,15 +518,15 @@ impl Mos6502 {
     }
 
     fn fetch_word(&mut self) -> Word {
-        let w1 = u16::from(self.mem.get_byte(self.pc as usize));
+        let lo = u16::from(self.mem.get_byte(self.pc as usize));
         self.program_counter();
         self.cycle();
 
-        let w2 = u16::from(self.mem.get_byte(self.pc as usize));
+        let hi = u16::from(self.mem.get_byte(self.pc as usize));
         self.program_counter();
         self.cycle();
 
-        (w2 << 8) | w1
+        (hi << 8) | lo
     }
 
     fn read_word_at_addr(&mut self, addr: Word) -> Word {
@@ -652,7 +655,8 @@ impl Mos6502 {
     ///// LDX /////
 
     fn ldx_imm(&mut self) {
-        todo!()
+        self.x = self.fetch_next_byte();
+        self.ldx_set_status();
     }
 
     fn ldx_zp(&mut self) {
