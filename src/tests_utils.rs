@@ -42,34 +42,7 @@ pub fn assert_all_status_flags_false_except(cpu: &Mos6502, excluded_flags: Vec<M
     assert_flag_state(cpu.negative_flag(), "NEGATIVE", Mos6502Flags::N);
 }
 
-pub fn __ld_imm_into_reg<F>(
-    opcode: Byte,
-    val: Byte,
-    ccost: u32,
-    test_register: Registers,
-    tflags: Vec<Mos6502Flags>,
-    mod_before_exe: Option<F>)
-where F: FnOnce(&mut Mos6502),
-{
-    let mut cpu = cpu_mem_set(vec![
-        (0xFFFC, opcode),
-        (0xFFFD, val),
-    ]);
-
-    if let Some(f) = mod_before_exe {
-        f(&mut cpu);
-    }
-
-    cpu.exe(Some(ccost));
-
-    match test_register {
-        Registers::A => assert_eq!(cpu.get_accumulator(), val),
-        Registers::X => assert_eq!(cpu.get_xreg(), val),
-        Registers::Y => assert_eq!(cpu.get_yreg(), val),
-    }
-
-    assert_eq!(cpu.get_cycles(), ccost);
-
+fn assert_true_flags(cpu: &Mos6502, tflags: &Vec<Mos6502Flags>) {
     tflags
         .iter()
         .for_each(|flag| {
@@ -83,7 +56,39 @@ where F: FnOnce(&mut Mos6502),
                 Mos6502Flags::V => assert!(cpu.overflow_flag()),
                 Mos6502Flags::N => assert!(cpu.negative_flag()),
             }
-    });
+        });
+}
 
+fn assert_register_has_value(cpu: &Mos6502, register: Registers, val: Byte) {
+    match register {
+        Registers::A => assert_eq!(cpu.get_accumulator(), val),
+        Registers::X => assert_eq!(cpu.get_xreg(), val),
+        Registers::Y => assert_eq!(cpu.get_yreg(), val),
+    }
+}
+
+pub fn __ld_imm_into_reg<F>(
+    opcode: Byte,
+    val: Byte,
+    ccost: u32,
+    test_register: Registers,
+    tflags: Vec<Mos6502Flags>,
+    mod_before_exe: Option<F>)
+where F: FnOnce(&mut Mos6502) {
+
+    let mut cpu = cpu_mem_set(vec![
+        (0xFFFC, opcode),
+        (0xFFFD, val),
+    ]);
+
+    if let Some(f) = mod_before_exe {
+        f(&mut cpu);
+    }
+
+    cpu.exe(Some(ccost));
+
+    assert_register_has_value(&cpu, test_register, val);
+    assert_eq!(cpu.get_cycles(), ccost);
+    assert_true_flags(&cpu, &tflags);
     assert_all_status_flags_false_except(&cpu, tflags);
 }
