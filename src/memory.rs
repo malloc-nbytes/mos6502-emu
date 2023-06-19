@@ -1,7 +1,7 @@
 pub const MEM_MAX: usize = 1024 * 64;
 
-type Byte = u8;
-type Word = u16;
+pub type Byte = u8;
+pub type Word = u16;
 
 pub struct Memory {
     data: [u8; MEM_MAX],

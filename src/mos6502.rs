@@ -38,8 +38,8 @@ pub struct Mos6502 {
     status: Byte,
     sp: Byte,
     pc: Word,
-    pub mem: Memory,
     cycles: u32,
+    pub mem: Memory,
 }
 
 impl std::fmt::Display for Mos6502 {

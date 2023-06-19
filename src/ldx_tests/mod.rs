@@ -12,34 +12,26 @@ mod tests {
 
     #[test]
     fn ldx_imm() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDX_IMM),
-            (0xFFFD, 0x84),
-        ]);
-
-        cpu.exe(Some(instructions::LDX_IMM_CCOST));
-
-        assert_eq!(cpu.get_accumulator(), 0x84);
-        assert_eq!(cpu.get_cycles(), instructions::LDX_IMM_CCOST);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![Mos6502Flags::N]);
-        assert!(cpu.negative_flag());
+        tests_utils::__ld_imm_into_reg(
+            instructions::LDX_IMM,
+            0x84,
+            instructions::LDX_IMM_CCOST,
+            tests_utils::Registers::X,
+            vec![Mos6502Flags::N],
+            None::<fn(&mut Mos6502)>
+        );
     }
 
     #[test]
     fn ldx_imm_wzero() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDX_IMM),
-            (0xFFFD, 0x00),
-        ]);
-
-        cpu.set_xreg(0x44);
-        cpu.exe(Some(instructions::LDX_IMM_CCOST));
-
-        assert_eq!(cpu.get_cycles(), instructions::LDX_IMM_CCOST);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![Mos6502Flags::Z]);
-        assert!(cpu.zero_flag());
+        tests_utils::__ld_imm_into_reg(
+            instructions::LDX_IMM,
+            0x00,
+            instructions::LDX_IMM_CCOST,
+            tests_utils::Registers::X,
+            vec![Mos6502Flags::Z],
+            None::<fn(&mut Mos6502)>
+        );
     }
 
     #[test]
