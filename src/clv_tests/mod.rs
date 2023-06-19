@@ -8,26 +8,26 @@ mod tests {
     };
     use crate::memory::Memory;
     use crate::instructions;
-    use crate::tests_utils::{cpu_mem_set, assert_all_status_flags_false_except};
+    use crate::tests_utils;
 
     #[test]
     fn clv_imp() {
-        let mut cpu = cpu_mem_set(vec![
+        let mut cpu = tests_utils::cpu_mem_set(vec![
             (0xFFFC, instructions::CLV_IMP),
         ]);
         cpu.exe(Some(instructions::CLV_IMP_CCOST));
-        assert_all_status_flags_false_except(&cpu, vec![]);
+        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
         assert_eq!(cpu.get_cycles(), instructions::CLV_IMP_CCOST);
     }
 
     #[test]
     fn clv_imp_wset() {
-        let mut cpu = cpu_mem_set(vec![
+        let mut cpu = tests_utils::cpu_mem_set(vec![
             (0xFFFC, instructions::CLV_IMP),
         ]);
         cpu.set_status_flag(Mos6502Flags::V);
         cpu.exe(Some(instructions::CLV_IMP_CCOST));
-        assert_all_status_flags_false_except(&cpu, vec![]);
+        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
         assert_eq!(cpu.get_cycles(), instructions::CLV_IMP_CCOST);
     }
 }

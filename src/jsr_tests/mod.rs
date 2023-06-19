@@ -8,11 +8,11 @@ mod tests {
     };
     use crate::memory::Memory;
     use crate::instructions;
-    use crate::tests_utils::{cpu_mem_set, assert_all_status_flags_false_except};
+    use crate::tests_utils;
 
     #[test]
     fn jsr_abs_wlda_imm() {
-        let mut cpu = cpu_mem_set(vec![
+        let mut cpu = tests_utils::cpu_mem_set(vec![
             (0xFFFC, instructions::JSR_ABS),
             (0xFFFD, 0x42),
             (0xFFFE, 0x42),
@@ -23,8 +23,9 @@ mod tests {
         cpu.exe(Some(instructions::JSR_ABS_CCOST + instructions::LDA_IMM_CCOST));
 
         assert_eq!(cpu.get_accumulator(), 0x84);
-        assert_all_status_flags_false_except(&cpu, vec![Mos6502Flags::N]);
-        assert!(cpu.negative_flag());
         assert_eq!(cpu.get_cycles(), instructions::JSR_ABS_CCOST + instructions::LDA_IMM_CCOST);
+
+        tests_utils::assert_all_status_flags_false_except(&cpu, vec![Mos6502Flags::N]);
+        assert!(cpu.negative_flag());
     }
 }

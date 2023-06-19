@@ -8,15 +8,15 @@ mod tests {
     };
     use crate::memory::Memory;
     use crate::instructions;
-    use crate::tests_utils::{cpu_mem_set, assert_all_status_flags_false_except};
+    use crate::tests_utils;
 
     #[test]
     fn sei_imp() {
-        let mut cpu = cpu_mem_set(vec![
+        let mut cpu = tests_utils::cpu_mem_set(vec![
             (0xFFFC, instructions::SEI_IMP),
         ]);
         cpu.exe(Some(instructions::SEI_IMP_CCOST));
-        assert_all_status_flags_false_except(&cpu, vec![Mos6502Flags::I]);
+        tests_utils::assert_all_status_flags_false_except(&cpu, vec![Mos6502Flags::I]);
         assert!(cpu.interrupts_disable_flag());
         assert_eq!(cpu.get_cycles(), instructions::SEI_IMP_CCOST);
     }
