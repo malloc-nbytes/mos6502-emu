@@ -547,7 +547,7 @@ impl Mos6502 {
         }
     }
 
-    fn ldx_set_status() {
+    fn ldx_set_status(&mut self) {
         if self.x == 0 {
             Mos6502Flags::Z.set(&mut self.status);
         } else {
@@ -560,7 +560,7 @@ impl Mos6502 {
         }
     }
 
-    fn ldy_set_status() {
+    fn ldy_set_status(&mut self) {
         if self.y == 0 {
             Mos6502Flags::Z.set(&mut self.status);
         } else {
