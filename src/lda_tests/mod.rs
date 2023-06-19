@@ -53,6 +53,7 @@ mod tests {
         cpu.exe(Some(instructions::LDA_ZP_CCOST));
 
         assert_eq!(cpu.get_accumulator(), 0x37);
+        assert_eq!(cpu.get_cycles(), instructions::LDA_ZP_CCOST);
         assert_all_status_flags_false_except(&cpu, vec![]);
     }
 
@@ -67,7 +68,9 @@ mod tests {
         cpu.set_xreg(5);
         cpu.exe(Some(instructions::LDA_ZPX_CCOST));
 
+        assert_eq!(cpu.get_cycles(), instructions::LDA_ZPX_CCOST);
         assert_eq!(cpu.get_accumulator(), 0x37);
+
         assert_all_status_flags_false_except(&cpu, vec![]);
     }
 
@@ -82,7 +85,9 @@ mod tests {
         cpu.set_xreg(0xFF);
         cpu.exe(Some(instructions::LDA_ZPX_CCOST));
 
+        assert_eq!(cpu.get_cycles(), instructions::LDA_ZPX_CCOST);
         assert_eq!(cpu.get_accumulator(), 0x37);
+
         assert_all_status_flags_false_except(&cpu, vec![]);
     }
 
@@ -99,6 +104,7 @@ mod tests {
 
         assert_eq!(cpu.get_accumulator(), 0x37);
         assert_eq!(cpu.get_cycles(), instructions::LDA_ABS_CCOST);
+
         assert_all_status_flags_false_except(&cpu, vec![]);
     }
 

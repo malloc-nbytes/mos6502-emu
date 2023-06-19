@@ -5,6 +5,7 @@ mod mos6502;
 mod memory;
 
 mod lda_tests;
+mod ldx_tests;
 mod jsr_tests;
 mod nop_tests;
 mod sec_tests;
