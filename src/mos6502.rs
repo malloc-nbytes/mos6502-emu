@@ -660,7 +660,9 @@ impl Mos6502 {
     }
 
     fn ldx_zp(&mut self) {
-        todo!()
+        let zpaddr: Byte = self.fetch_next_byte();
+        self.x = self.read_byte_at_addr(Word::from(zpaddr));
+        self.lda_set_status();
     }
 
     fn ldx_abs(&mut self) {
