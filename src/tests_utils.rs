@@ -8,6 +8,7 @@ use crate::mos6502::{
 use crate::memory::{
     Memory,
     Byte,
+    Word,
 };
 
 pub enum Registers {
@@ -67,15 +68,28 @@ fn assert_register_has_value(cpu: &Mos6502, register: Registers, val: Byte) {
     }
 }
 
-pub fn __ld_imm_into_reg<F>(
+fn perform_ld_asserts(
+    cpu: &Mos6502,
+    test_register: Registers,
+    ccost: u32,
+    val: Byte,
+    tflags: Vec<Mos6502Flags>)
+{
+    assert_register_has_value(&cpu, test_register, val);
+    assert_eq!(cpu.get_cycles(), ccost);
+    assert_true_flags(&cpu, &tflags);
+    assert_all_status_flags_false_except(&cpu, tflags);
+}
+
+pub fn ld_imm_into_reg<F>(
     opcode: Byte,
     val: Byte,
     ccost: u32,
     test_register: Registers,
     tflags: Vec<Mos6502Flags>,
     mod_before_exe: Option<F>)
-where F: FnOnce(&mut Mos6502) {
-
+where F: FnOnce(&mut Mos6502)
+{
     let mut cpu = cpu_mem_set(vec![
         (0xFFFC, opcode),
         (0xFFFD, val),
@@ -86,9 +100,29 @@ where F: FnOnce(&mut Mos6502) {
     }
 
     cpu.exe(Some(ccost));
+    perform_ld_asserts(&cpu, test_register, ccost, val, tflags);
+}
 
-    assert_register_has_value(&cpu, test_register, val);
-    assert_eq!(cpu.get_cycles(), ccost);
-    assert_true_flags(&cpu, &tflags);
-    assert_all_status_flags_false_except(&cpu, tflags);
+pub fn ld_zp<F>(
+    opcode: Byte,
+    addr: Byte,
+    val: Byte,
+    ccost: u32,
+    test_register: Registers,
+    tflags: Vec<Mos6502Flags>,
+    mod_before_exe: Option<F>,
+)
+where F: FnOnce(&mut Mos6502) {
+    let mut cpu = cpu_mem_set(vec![
+        (0xFFFC, opcode),
+        (0xFFFD, addr),
+        (Word::from(addr), val),
+    ]);
+
+    if let Some(f) = mod_before_exe {
+        f(&mut cpu);
+    }
+
+    cpu.exe(Some(ccost));
+    perform_ld_asserts(&cpu, test_register, ccost, val, tflags);
 }

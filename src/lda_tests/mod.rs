@@ -12,7 +12,7 @@ mod tests {
 
     #[test]
     fn lda_imm() {
-        tests_utils::__ld_imm_into_reg(
+        tests_utils::ld_imm_into_reg(
             instructions::LDA_IMM,
             0x84,
             instructions::LDA_IMM_CCOST,
@@ -24,7 +24,7 @@ mod tests {
 
     #[test]
     fn lda_imm_wzero() {
-        tests_utils::__ld_imm_into_reg(
+        tests_utils::ld_imm_into_reg(
             instructions::LDA_IMM,
             0x00,
             instructions::LDA_IMM_CCOST,
@@ -36,17 +36,15 @@ mod tests {
 
     #[test]
     fn lda_zp() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDA_ZP),
-            (0xFFFD, 0x42),
-            (0x0042, 0x37),
-        ]);
-
-        cpu.exe(Some(instructions::LDA_ZP_CCOST));
-
-        assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_eq!(cpu.get_cycles(), instructions::LDA_ZP_CCOST);
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        tests_utils::ld_zp(
+            instructions::LDA_ZP,
+            0x42,
+            0x37,
+            instructions::LDA_ZP_CCOST,
+            tests_utils::Registers::A,
+            vec![],
+            None::<fn(&mut Mos6502)>
+        );
     }
 
     #[test]

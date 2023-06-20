@@ -12,7 +12,7 @@ mod tests {
 
     #[test]
     fn ldx_imm() {
-        tests_utils::__ld_imm_into_reg(
+        tests_utils::ld_imm_into_reg(
             instructions::LDX_IMM,
             0x84,
             instructions::LDX_IMM_CCOST,
@@ -24,7 +24,7 @@ mod tests {
 
     #[test]
     fn ldx_imm_wzero() {
-        tests_utils::__ld_imm_into_reg(
+        tests_utils::ld_imm_into_reg(
             instructions::LDX_IMM,
             0x00,
             instructions::LDX_IMM_CCOST,
