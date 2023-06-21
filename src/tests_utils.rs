@@ -81,8 +81,16 @@ fn perform_ld_asserts(
     assert_all_status_flags_false_except(&cpu, tflags);
 }
 
-pub fn ld_imm_into_reg<F>(
-    opcode: Byte,
+pub fn word_from_bytes(lo: Byte, hi: Byte) -> Word {
+    (Word::from(hi) << 8) | Word::from(lo)
+}
+
+pub fn word_from_byte_addition(b1: Byte, b2: Byte) -> Word {
+    (b1 as Word + b2 as Word) % 256
+}
+
+pub fn ld_into_reg<F>(
+    mem: Vec<(Word, Byte)>,
     val: Byte,
     ccost: u32,
     test_register: Registers,
@@ -90,34 +98,7 @@ pub fn ld_imm_into_reg<F>(
     mod_before_exe: Option<F>)
 where F: FnOnce(&mut Mos6502)
 {
-    let mut cpu = cpu_mem_set(vec![
-        (0xFFFC, opcode),
-        (0xFFFD, val),
-    ]);
-
-    if let Some(f) = mod_before_exe {
-        f(&mut cpu);
-    }
-
-    cpu.exe(Some(ccost));
-    perform_ld_asserts(&cpu, test_register, ccost, val, tflags);
-}
-
-pub fn ld_zp<F>(
-    opcode: Byte,
-    addr: Byte,
-    val: Byte,
-    ccost: u32,
-    test_register: Registers,
-    tflags: Vec<Mos6502Flags>,
-    mod_before_exe: Option<F>,
-)
-where F: FnOnce(&mut Mos6502) {
-    let mut cpu = cpu_mem_set(vec![
-        (0xFFFC, opcode),
-        (0xFFFD, addr),
-        (Word::from(addr), val),
-    ]);
+    let mut cpu = cpu_mem_set(mem);
 
     if let Some(f) = mod_before_exe {
         f(&mut cpu);

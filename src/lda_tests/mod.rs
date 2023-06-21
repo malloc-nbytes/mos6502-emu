@@ -6,15 +6,23 @@ mod tests {
         Mos6502,
         Mos6502Flags,
     };
-    use crate::memory::Memory;
+    use crate::memory::{
+        Memory,
+        Word,
+        Byte,
+    };
     use crate::instructions;
     use crate::tests_utils;
 
     #[test]
     fn lda_imm() {
-        tests_utils::ld_imm_into_reg(
-            instructions::LDA_IMM,
-            0x84,
+        let val = 0x84;
+        tests_utils::ld_into_reg(
+            vec![
+                (0xFFFC, instructions::LDA_IMM),
+                (0xFFFD, val),
+            ],
+            val,
             instructions::LDA_IMM_CCOST,
             tests_utils::Registers::A,
             vec![Mos6502Flags::N],
@@ -24,9 +32,13 @@ mod tests {
 
     #[test]
     fn lda_imm_wzero() {
-        tests_utils::ld_imm_into_reg(
-            instructions::LDA_IMM,
-            0x00,
+        let val = 0x00;
+        tests_utils::ld_into_reg(
+            vec![
+                (0xFFFC, instructions::LDA_IMM),
+                (0xFFFD, val),
+            ],
+            val,
             instructions::LDA_IMM_CCOST,
             tests_utils::Registers::A,
             vec![Mos6502Flags::Z],
@@ -36,10 +48,14 @@ mod tests {
 
     #[test]
     fn lda_zp() {
-        tests_utils::ld_zp(
-            instructions::LDA_ZP,
-            0x42,
-            0x37,
+        let (addr, val) = (0x42, 0x37);
+        tests_utils::ld_into_reg(
+            vec![
+                (0xFFFC, instructions::LDA_ZP),
+                (0xFFFD, addr),
+                (0x0042, val),
+            ],
+            val,
             instructions::LDA_ZP_CCOST,
             tests_utils::Registers::A,
             vec![],
@@ -49,53 +65,54 @@ mod tests {
 
     #[test]
     fn lda_zpx() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDA_ZPX),
-            (0xFFFD, 0x42),
-            (0x0047, 0x37),
-        ]);
-
-        cpu.set_xreg(5);
-        cpu.exe(Some(instructions::LDA_ZPX_CCOST));
-
-        assert_eq!(cpu.get_cycles(), instructions::LDA_ZPX_CCOST);
-        assert_eq!(cpu.get_accumulator(), 0x37);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (addr, val, xreg) = (0x42, 0x37, 5);
+        tests_utils::ld_into_reg(
+            vec![
+                (0xFFFC, instructions::LDA_ZPX),
+                (0xFFFD, addr),
+                ((addr + xreg) as u16, val),
+            ],
+            val,
+            instructions::LDA_ZPX_CCOST,
+            tests_utils::Registers::A,
+            vec![],
+            Some(|cpu: &mut Mos6502| { cpu.set_xreg(xreg); })
+        );
     }
 
     #[test]
     fn lda_zpx_wwrap() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDA_ZPX),
-            (0xFFFD, 0x80),
-            (0x007F, 0x37),
-        ]);
-
-        cpu.set_xreg(0xFF);
-        cpu.exe(Some(instructions::LDA_ZPX_CCOST));
-
-        assert_eq!(cpu.get_cycles(), instructions::LDA_ZPX_CCOST);
-        assert_eq!(cpu.get_accumulator(), 0x37);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (addr, val, xreg) = (0x80, 0x37, 0xFF);
+        tests_utils::ld_into_reg(
+            vec![
+                (0xFFFC, instructions::LDA_ZPX),
+                (0xFFFD, 0x80),
+                (tests_utils::word_from_byte_addition(addr, xreg), val),
+            ],
+            val,
+            instructions::LDA_ZPX_CCOST,
+            tests_utils::Registers::A,
+            vec![],
+            Some(|cpu: &mut Mos6502| { cpu.set_xreg(xreg); })
+        );
     }
 
     #[test]
     fn lda_abs() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDA_ABS),
-            (0xFFFD, 0x80),
-            (0xFFFE, 0x44), // 4480
-            (0x4480, 0x37),
-        ]);
-
-        cpu.exe(Some(instructions::LDA_ABS_CCOST));
-
-        assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_eq!(cpu.get_cycles(), instructions::LDA_ABS_CCOST);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (val, lo, hi) = (0x37, 0x80, 0x44);
+        tests_utils::ld_into_reg(
+            vec![
+                (0xFFFC, instructions::LDA_ABS),
+                (0xFFFD, lo),
+                (0xFFFE, hi),
+                (tests_utils::word_from_bytes(lo, hi), val),
+            ],
+            val,
+            instructions::LDA_ABS_CCOST,
+            tests_utils::Registers::A,
+            vec![],
+            None::<fn(&mut Mos6502)>
+        );
     }
 
     #[test]

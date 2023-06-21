@@ -12,9 +12,13 @@ mod tests {
 
     #[test]
     fn ldx_imm() {
-        tests_utils::ld_imm_into_reg(
-            instructions::LDX_IMM,
-            0x84,
+        let val = 0x84;
+        tests_utils::ld_into_reg(
+            vec![
+                (0xFFFC, instructions::LDX_IMM),
+                (0xFFFD, val),
+            ],
+            val,
             instructions::LDX_IMM_CCOST,
             tests_utils::Registers::X,
             vec![Mos6502Flags::N],
@@ -24,9 +28,13 @@ mod tests {
 
     #[test]
     fn ldx_imm_wzero() {
-        tests_utils::ld_imm_into_reg(
-            instructions::LDX_IMM,
-            0x00,
+        let val = 0x00;
+        tests_utils::ld_into_reg(
+            vec![
+                (0xFFFC, instructions::LDX_IMM),
+                (0xFFFD, val),
+            ],
+            val,
             instructions::LDX_IMM_CCOST,
             tests_utils::Registers::X,
             vec![Mos6502Flags::Z],
