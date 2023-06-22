@@ -666,7 +666,9 @@ impl Mos6502 {
     }
 
     fn ldx_abs(&mut self) {
-        todo!()
+        let abs_addr: Word = self.fetch_word();
+        self.x = self.read_byte_at_addr(abs_addr);
+        self.ldx_set_status();
     }
 
     fn ldx_zpy(&mut self) {
@@ -674,7 +676,16 @@ impl Mos6502 {
     }
 
     fn ldx_absy(&mut self) {
-        todo!()
+        let mut abs_addr: Word = self.fetch_word();
+
+        self.offset_word_wocycle(&mut abs_addr, self.y);
+        self.x = self.read_byte_at_addr(abs_addr);
+
+        if (abs_addr % 256) + Word::from(self.y) > 0xFE {
+            self.cycle();
+        }
+
+        self.ldx_set_status();
     }
 
     ///// LDY /////

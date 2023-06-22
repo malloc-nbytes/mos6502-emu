@@ -6,7 +6,11 @@ mod tests {
         Mos6502,
         Mos6502Flags,
     };
-    use crate::memory::Memory;
+    use crate::memory::{
+        Memory,
+        Word,
+        Byte,
+    };
     use crate::instructions;
     use crate::tests_utils;
     use crate::tests_utils::PC_START;
@@ -45,54 +49,59 @@ mod tests {
 
     #[test]
     fn ldx_abs() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDX_ABS),
-            (0xFFFD, 0x80),
-            (0xFFFE, 0x44), // 4480
-            (0x4480, 0x37),
-        ]);
-
-        cpu.exe(Some(instructions::LDX_ABS_CCOST));
-
-        assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_eq!(cpu.get_cycles(), instructions::LDX_ABS_CCOST);
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (hi, lo, val) = (0x44, 0x80, 0x37);
+        let dest_addr = tests_utils::word_from_bytes(hi, lo);
+        tests_utils::ld_into_reg(
+            vec![
+                (PC_START, instructions::LDX_ABS),
+                (PC_START + 1, lo),
+                (PC_START + 2, hi),
+                (dest_addr, val),
+            ],
+            val,
+            instructions::LDX_ABS_CCOST,
+            tests_utils::Registers::X,
+            vec![],
+            None::<fn(&mut Mos6502)>
+        );
     }
 
     #[test]
     fn ldx_absy_wopage_boundary() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDX_ABSY),
-            (0xFFFD, 0x80),
-            (0xFFFE, 0x44), // 4480
-            (0x4481, 0x37),
-        ]);
-
-        cpu.set_yreg(1);
-        cpu.exe(Some(instructions::LDX_ABSY_CCOST));
-
-        assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_eq!(cpu.get_cycles(), instructions::LDX_ABSY_CCOST);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (hi, lo, yreg, val) = (0x44, 0x80, 1u8, 0x37);
+        let dest_addr = tests_utils::word_from_bytes(hi, lo) + yreg as Word;
+        tests_utils::ld_into_reg(
+            vec![
+                (PC_START, instructions::LDX_ABSY),
+                (PC_START + 1, lo),
+                (PC_START + 2, hi),
+                (dest_addr, val),
+            ],
+            val,
+            instructions::LDX_ABSY_CCOST,
+            tests_utils::Registers::X,
+            vec![],
+            Some(|cpu: &mut Mos6502| { cpu.set_yreg(yreg) })
+        );
     }
 
     #[test]
     fn ldx_absy_wpage_boundary() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDX_ABSY),
-            (0xFFFD, 0x02),
-            (0xFFFE, 0x44), // 0x4402
-            (0x4501, 0x37), // 0x4402 + 0xFF crosses page boundary
-        ]);
-
-        cpu.set_yreg(0xFF);
-        cpu.exe(Some(instructions::LDX_ABSY_CCOST + 1));
-
-        assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_eq!(cpu.get_cycles(), instructions::LDX_ABSY_CCOST + 1);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (hi, lo, yreg, val) = (0x44, 0x02, 0xFF, 0x37);
+        let dest_addr = tests_utils::word_from_bytes(hi, lo) + yreg as Word;
+        tests_utils::ld_into_reg(
+            vec![
+                (PC_START, instructions::LDX_ABSY),
+                (PC_START + 1, lo),
+                (PC_START + 2, hi),
+                (dest_addr, val),
+            ],
+            val,
+            instructions::LDX_ABSY_CCOST + 1,
+            tests_utils::Registers::X,
+            vec![],
+            Some(|cpu: &mut Mos6502| { cpu.set_yreg(yreg) })
+        );
     }
 
     #[test]
