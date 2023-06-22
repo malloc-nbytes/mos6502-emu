@@ -13,8 +13,7 @@ mod tests {
     };
     use crate::instructions;
     use crate::tests_utils;
-
-    const PC_START: Word = 0xFFFC;
+    use crate::tests_utils::PC_START;
 
     #[test]
     fn lda_imm() {

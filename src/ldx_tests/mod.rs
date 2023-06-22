@@ -9,14 +9,15 @@ mod tests {
     use crate::memory::Memory;
     use crate::instructions;
     use crate::tests_utils;
+    use crate::tests_utils::PC_START;
 
     #[test]
     fn ldx_imm() {
         let val = 0x84;
         tests_utils::ld_into_reg(
             vec![
-                (0xFFFC, instructions::LDX_IMM),
-                (0xFFFD, val),
+                (PC_START, instructions::LDX_IMM),
+                (PC_START + 1, val),
             ],
             val,
             instructions::LDX_IMM_CCOST,
@@ -31,8 +32,8 @@ mod tests {
         let val = 0x00;
         tests_utils::ld_into_reg(
             vec![
-                (0xFFFC, instructions::LDX_IMM),
-                (0xFFFD, val),
+                (PC_START, instructions::LDX_IMM),
+                (PC_START + 1, val),
             ],
             val,
             instructions::LDX_IMM_CCOST,

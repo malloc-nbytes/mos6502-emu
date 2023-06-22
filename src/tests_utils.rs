@@ -17,6 +17,8 @@ pub enum Registers {
     Y,
 }
 
+pub const PC_START: Word = 0xFFFC;
+
 pub fn cpu_mem_set(instrs: Vec<(u16, u8)>) -> Mos6502 {
     let mut mem = Memory::new();
     for (addr, opcode) in instrs {
