@@ -221,39 +221,43 @@ mod tests {
 
     #[test]
     fn lda_zpy_ind_wopage_boundary() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDA_ZPY_IND),
-            (0xFFFD, 0x02),
-            (0x0002, 0x00),
-            (0x0003, 0x80),
-            (0x8004, 0x37), // 0x8004 = 0x8000 + 0x04 (yreg)
-        ]);
-
-        cpu.set_yreg(0x04);
-        cpu.exe(Some(instructions::LDA_ZPY_IND_CCOST));
-
-        assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_eq!(cpu.get_cycles(), instructions::LDA_ZPY_IND_CCOST);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (hi, lo, yreg, val) = (0x80, 0x00, 0x04, 0x37);
+        let arb_addr = 0x02;
+        let dest_addr = tests_utils::word_from_bytes(hi, lo) + yreg as Word;
+        tests_utils::ld_into_reg(
+            vec![
+                (PC_START, instructions::LDA_ZPY_IND),
+                (PC_START + 1, arb_addr),
+                (Word::from(arb_addr), lo),
+                (Word::from(arb_addr) + 1, hi),
+                (dest_addr, val),
+            ],
+            val,
+            instructions::LDA_ZPY_IND_CCOST,
+            tests_utils::Registers::A,
+            vec![],
+            Some(|cpu: &mut Mos6502| { cpu.set_yreg(yreg) })
+        );
     }
 
     #[test]
     fn lda_zpy_ind_wpage_boundary() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDA_ZPY_IND),
-            (0xFFFD, 0x02),
-            (0x0002, 0x02),
-            (0x0003, 0x80),
-            (0x8101, 0x37), // 0x8101 = 0x8002 + 0xFF (yreg)
-        ]);
-
-        cpu.set_yreg(0xFF);
-        cpu.exe(Some(instructions::LDA_ZPY_IND_CCOST + 1));
-
-        assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_eq!(cpu.get_cycles(), instructions::LDA_ZPY_IND_CCOST + 1);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (hi, lo, yreg, val) = (0x80, 0x02, 0xFF, 0x37);
+        let arb_addr = 0x02;
+        let dest_addr = tests_utils::word_from_bytes(hi, lo) + yreg as Word;
+        tests_utils::ld_into_reg(
+            vec![
+                (PC_START, instructions::LDA_ZPY_IND),
+                (PC_START + 1, arb_addr),
+                (Word::from(arb_addr), lo),
+                (Word::from(arb_addr) + 1, hi),
+                (dest_addr, val),
+            ],
+            val,
+            instructions::LDA_ZPY_IND_CCOST + 1,
+            tests_utils::Registers::A,
+            vec![],
+            Some(|cpu: &mut Mos6502| { cpu.set_yreg(yreg) })
+        );
     }
 }
