@@ -14,13 +14,15 @@ mod tests {
     use crate::instructions;
     use crate::tests_utils;
 
+    const PC_START: Word = 0xFFFC;
+
     #[test]
     fn lda_imm() {
         let val = 0x84;
         tests_utils::ld_into_reg(
             vec![
-                (0xFFFC, instructions::LDA_IMM),
-                (0xFFFD, val),
+                (PC_START, instructions::LDA_IMM),
+                (PC_START + 1, val),
             ],
             val,
             instructions::LDA_IMM_CCOST,
@@ -35,8 +37,8 @@ mod tests {
         let val = 0x00;
         tests_utils::ld_into_reg(
             vec![
-                (0xFFFC, instructions::LDA_IMM),
-                (0xFFFD, val),
+                (PC_START, instructions::LDA_IMM),
+                (PC_START + 1, val),
             ],
             val,
             instructions::LDA_IMM_CCOST,
@@ -51,8 +53,8 @@ mod tests {
         let (addr, val) = (0x42, 0x37);
         tests_utils::ld_into_reg(
             vec![
-                (0xFFFC, instructions::LDA_ZP),
-                (0xFFFD, addr),
+                (PC_START, instructions::LDA_ZP),
+                (PC_START + 1, addr),
                 (0x0042, val),
             ],
             val,
@@ -68,8 +70,8 @@ mod tests {
         let (addr, val, xreg) = (0x42, 0x37, 5);
         tests_utils::ld_into_reg(
             vec![
-                (0xFFFC, instructions::LDA_ZPX),
-                (0xFFFD, addr),
+                (PC_START, instructions::LDA_ZPX),
+                (PC_START + 1, addr),
                 ((addr + xreg) as u16, val),
             ],
             val,
@@ -85,8 +87,8 @@ mod tests {
         let (addr, val, xreg) = (0x80, 0x37, 0xFF);
         tests_utils::ld_into_reg(
             vec![
-                (0xFFFC, instructions::LDA_ZPX),
-                (0xFFFD, 0x80),
+                (PC_START, instructions::LDA_ZPX),
+                (PC_START + 1, 0x80),
                 (tests_utils::word_from_byte_addition(addr, xreg), val),
             ],
             val,
@@ -99,13 +101,13 @@ mod tests {
 
     #[test]
     fn lda_abs() {
-        let (val, lo, hi) = (0x37, 0x80, 0x44);
+        let (lo, hi, val) = (0x80, 0x44, 0x37);
         tests_utils::ld_into_reg(
             vec![
-                (0xFFFC, instructions::LDA_ABS),
-                (0xFFFD, lo),
-                (0xFFFE, hi),
-                (tests_utils::word_from_bytes(lo, hi), val),
+                (PC_START, instructions::LDA_ABS),
+                (PC_START + 1, lo),
+                (PC_START + 2, hi),
+                (tests_utils::word_from_bytes(hi, lo), val),
             ],
             val,
             instructions::LDA_ABS_CCOST,
@@ -117,93 +119,104 @@ mod tests {
 
     #[test]
     fn lda_absx_wopage_boundary() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDA_ABSX),
-            (0xFFFD, 0x80),
-            (0xFFFE, 0x44), // 4480
-            (0x4481, 0x37),
-        ]);
-
-        cpu.set_xreg(1);
-        cpu.exe(Some(instructions::LDA_ABSX_CCOST));
-
-        assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_eq!(cpu.get_cycles(), instructions::LDA_ABSX_CCOST);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (hi, lo, xreg, val) = (0x44, 0x80, 1, 0x37);
+        let dest_addr =
+            tests_utils::word_from_bytes(hi, lo) + Word::from(xreg);
+        tests_utils::ld_into_reg(
+            vec![
+                (PC_START, instructions::LDA_ABSX),
+                (PC_START + 1, lo),
+                (PC_START + 2, hi),
+                (dest_addr, val),
+            ],
+            val,
+            instructions::LDA_ABSX_CCOST,
+            tests_utils::Registers::A,
+            vec![],
+            Some(|cpu: &mut Mos6502| { cpu.set_xreg(xreg) })
+        );
     }
 
     #[test]
     fn lda_absx_wpage_boundary() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDA_ABSX),
-            (0xFFFD, 0x02),
-            (0xFFFE, 0x44), // 0x4402
-            (0x4501, 0x37), // 0x4402 + 0xFF crosses page boundary
-        ]);
-
-        cpu.set_xreg(0xFF);
-        cpu.exe(Some(instructions::LDA_ABSX_CCOST + 1));
-
-        assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_eq!(cpu.get_cycles(), instructions::LDA_ABSX_CCOST + 1);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (hi, lo, xreg, val) = (0x44, 0x02, 0xFF, 0x37);
+        let dest_addr =
+            tests_utils::word_from_bytes(hi, lo) + Word::from(xreg);
+        tests_utils::ld_into_reg(
+            vec![
+                (PC_START, instructions::LDA_ABSX),
+                (PC_START + 1, lo),
+                (PC_START + 2, hi),
+                (dest_addr, val),
+            ],
+            val,
+            instructions::LDA_ABSX_CCOST + 1,
+            tests_utils::Registers::A,
+            vec![],
+            Some(|cpu: &mut Mos6502| { cpu.set_xreg(xreg) })
+        );
     }
 
     #[test]
     fn lda_absy_wopage_boundary() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDA_ABSY),
-            (0xFFFD, 0x80),
-            (0xFFFE, 0x44), // 4480
-            (0x4481, 0x37),
-        ]);
-
-        cpu.set_yreg(1);
-        cpu.exe(Some(instructions::LDA_ABSY_CCOST));
-
-        assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_eq!(cpu.get_cycles(), instructions::LDA_ABSY_CCOST);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (hi, lo, yreg, val) = (0x44, 0x80, 1, 0x37);
+        let dest_addr =
+            tests_utils::word_from_bytes(hi, lo) + Word::from(yreg);
+        tests_utils::ld_into_reg(
+            vec![
+                (PC_START, instructions::LDA_ABSY),
+                (PC_START + 1, lo),
+                (PC_START + 2, hi),
+                (dest_addr, val),
+            ],
+            val,
+            instructions::LDA_ABSY_CCOST,
+            tests_utils::Registers::A,
+            vec![],
+            Some(|cpu: &mut Mos6502| { cpu.set_yreg(yreg) })
+        );
     }
 
     #[test]
     fn lda_absy_wpage_boundary() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDA_ABSY),
-            (0xFFFD, 0x02),
-            (0xFFFE, 0x44), // 0x4402
-            (0x4501, 0x37), // 0x4402 + 0xFF crosses page boundary
-        ]);
-
-        cpu.set_yreg(0xFF);
-        cpu.exe(Some(instructions::LDA_ABSY_CCOST + 1));
-
-        assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_eq!(cpu.get_cycles(), instructions::LDA_ABSY_CCOST + 1);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (hi, lo, yreg, val) = (0x44, 0x02, 0xFF, 0x37);
+        let dest_addr =
+            tests_utils::word_from_bytes(hi, lo) + Word::from(yreg);
+        tests_utils::ld_into_reg(
+            vec![
+                (PC_START, instructions::LDA_ABSY),
+                (PC_START + 1, lo),
+                (PC_START + 2, hi),
+                (dest_addr, val),
+            ],
+            val,
+            instructions::LDA_ABSY_CCOST + 1,
+            tests_utils::Registers::A,
+            vec![],
+            Some(|cpu: &mut Mos6502| { cpu.set_yreg(yreg) })
+        );
     }
 
     #[test]
     fn lda_zpx_ind() {
-        let mut cpu = tests_utils::cpu_mem_set(vec![
-            (0xFFFC, instructions::LDA_ZPX_IND),
-            (0xFFFD, 0x02),
-            (0x0006, 0x00), // 0x0006 = 0x02 + 0x04 (xreg)
-            (0x0007, 0x80),
-            (0x8000, 0x37),
-        ]);
-
-        cpu.set_xreg(0x04);
-        cpu.exe(Some(instructions::LDA_ZPX_IND_CCOST));
-
-        assert_eq!(cpu.get_accumulator(), 0x37);
-        assert_eq!(cpu.get_cycles(), instructions::LDA_ZPX_IND_CCOST);
-
-        tests_utils::assert_all_status_flags_false_except(&cpu, vec![]);
+        let (hi, lo, xreg, val) = (0x80, 0x00, 0x04u8, 0x37);
+        let arb_addr = 0x02u8;
+        let dest_addr1 = tests_utils::word_from_byte_addition(arb_addr, xreg);
+        let dest_addr2 = tests_utils::word_from_bytes(hi, lo);
+        tests_utils::ld_into_reg(
+            vec![
+                (PC_START, instructions::LDA_ZPX_IND),
+                (PC_START + 1, arb_addr),
+                (dest_addr1, lo),
+                (dest_addr1 + 1, hi),
+                (dest_addr2, val),
+            ],
+            val,
+            instructions::LDA_ZPX_IND_CCOST,
+            tests_utils::Registers::A,
+            vec![],
+            Some(|cpu: &mut Mos6502| { cpu.set_xreg(xreg) })
+        );
     }
 
     #[test]

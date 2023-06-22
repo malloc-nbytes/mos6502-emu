@@ -81,7 +81,7 @@ fn perform_ld_asserts(
     assert_all_status_flags_false_except(&cpu, tflags);
 }
 
-pub fn word_from_bytes(lo: Byte, hi: Byte) -> Word {
+pub fn word_from_bytes(hi: Byte, lo: Byte) -> Word {
     (Word::from(hi) << 8) | Word::from(lo)
 }
 
