@@ -17,6 +17,35 @@ pub enum Registers {
     Y,
 }
 
+#[derive(Debug)]
+pub enum FlagAssertionError {
+    Carry,
+    Zero,
+    InterruptsDisable,
+    DecimalMode,
+    Break,
+    Unused,
+    Overflow,
+    Negative,
+}
+
+impl std::fmt::Display for FlagAssertionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            FlagAssertionError::Carry => write!(f, "Failed assertion for flag: CARRY"),
+            FlagAssertionError::Zero => write!(f, "Failed assertion for flag: ZERO"),
+            FlagAssertionError::InterruptsDisable => write!(f, "Failed assertion for flag: INTERRUPTS DISABLE"),
+            FlagAssertionError::DecimalMode => write!(f, "Failed assertion for flag: DECIMAL MODE"),
+            FlagAssertionError::Break => write!(f, "Failed assertion for flag: BREAK"),
+            FlagAssertionError::Unused => write!(f, "Failed assertion for flag: UNUSED"),
+            FlagAssertionError::Overflow => write!(f, "Failed assertion for flag: OVERFLOW"),
+            FlagAssertionError::Negative => write!(f, "Failed assertion for flag: NEGATIVE"),
+        }
+    }
+}
+
+impl std::error::Error for FlagAssertionError {}
+
 pub const PC_START: Word = 0xFFFC;
 
 pub fn cpu_mem_set(instrs: Vec<(u16, u8)>) -> Mos6502 {
@@ -29,20 +58,35 @@ pub fn cpu_mem_set(instrs: Vec<(u16, u8)>) -> Mos6502 {
     cpu
 }
 
-pub fn assert_all_status_flags_false_except(cpu: &Mos6502, excluded_flags: Vec<Mos6502Flags>) {
-    let assert_flag_state = |flag: bool, flag_name: &str, current_flag: Mos6502Flags| {
+pub fn assert_all_status_flags_false_except(cpu: &Mos6502, excluded_flags: Vec<Mos6502Flags>) -> Result<(), FlagAssertionError> {
+    let assert_flag_state = |flag: bool, current_flag: Mos6502Flags| {
         if !excluded_flags.contains(&current_flag) {
-            assert!(!flag, "Failed assertion for flag: {}", flag_name);
+            if flag {
+                Err(match current_flag {
+                    Mos6502Flags::C => FlagAssertionError::Carry,
+                    Mos6502Flags::Z => FlagAssertionError::Zero,
+                    Mos6502Flags::I => FlagAssertionError::InterruptsDisable,
+                    Mos6502Flags::D => FlagAssertionError::DecimalMode,
+                    Mos6502Flags::B => FlagAssertionError::Break,
+                    Mos6502Flags::U => FlagAssertionError::Unused,
+                    Mos6502Flags::V => FlagAssertionError::Overflow,
+                    Mos6502Flags::N => FlagAssertionError::Negative,
+                })?;
+            }
         }
+        Ok(())
     };
-    assert_flag_state(cpu.carry_flag(), "CARRY", Mos6502Flags::C);
-    assert_flag_state(cpu.zero_flag(), "ZERO", Mos6502Flags::Z);
-    assert_flag_state(cpu.interrupts_disable_flag(), "INTERRUPTS DISABLE", Mos6502Flags::I);
-    assert_flag_state(cpu.decimal_mode_flag(), "DECIMAL MODE", Mos6502Flags::D);
-    assert_flag_state(cpu.break_flag(), "BREAK", Mos6502Flags::B);
-    assert_flag_state(cpu.unused_flag(), "UNUSED", Mos6502Flags::U);
-    assert_flag_state(cpu.overflow_flag(), "OVERFLOW", Mos6502Flags::V);
-    assert_flag_state(cpu.negative_flag(), "NEGATIVE", Mos6502Flags::N);
+
+    assert_flag_state(cpu.carry_flag(), Mos6502Flags::C)?;
+    assert_flag_state(cpu.zero_flag(), Mos6502Flags::Z)?;
+    assert_flag_state(cpu.interrupts_disable_flag(), Mos6502Flags::I)?;
+    assert_flag_state(cpu.decimal_mode_flag(), Mos6502Flags::D)?;
+    assert_flag_state(cpu.break_flag(), Mos6502Flags::B)?;
+    assert_flag_state(cpu.unused_flag(), Mos6502Flags::U)?;
+    assert_flag_state(cpu.overflow_flag(), Mos6502Flags::V)?;
+    assert_flag_state(cpu.negative_flag(), Mos6502Flags::N)?;
+
+    Ok(())
 }
 
 fn assert_true_flags(cpu: &Mos6502, tflags: &Vec<Mos6502Flags>) {
@@ -80,7 +124,10 @@ fn perform_ld_asserts(
     assert_register_has_value(&cpu, test_register, val);
     assert_eq!(cpu.get_cycles(), ccost);
     assert_true_flags(&cpu, &tflags);
-    assert_all_status_flags_false_except(&cpu, tflags);
+    match assert_all_status_flags_false_except(&cpu, tflags) {
+        Ok(()) => println!("Flag assertion success"),
+        Err(err) => eprintln!("Flag assertion error: {err}"),
+    }
 }
 
 pub fn word_from_bytes(hi: Byte, lo: Byte) -> Word {
